@@ -425,6 +425,26 @@
         currentPatient.postMealSugar = parseInt(paramGlucose) || currentPatient.postMealSugar;
       }
 
+      // Check capture mode or uploaded image from ASHA account
+      const mode = urlParams.get('mode');
+      const savedPhoto = sessionStorage.getItem('retisync_uploaded_eye_photo');
+      const savedPhotoName = sessionStorage.getItem('retisync_uploaded_eye_photo_name');
+
+      if (mode === 'upload' && savedPhoto) {
+        const displayImg = document.getElementById('retinaDisplayImg');
+        if (displayImg) displayImg.src = savedPhoto;
+
+        const btnLens = document.getElementById('btnCaptureLens');
+        const btnUpload = document.getElementById('btnCaptureUpload');
+        if (btnUpload && btnLens) {
+          btnUpload.className = 'bg-white border-2 border-retisync-blue rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn transition-all';
+          btnLens.className = 'bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn hover:border-slate-300 transition-all';
+        }
+        showToast('Photo Loaded', `${savedPhotoName || 'Uploaded eye photo'} loaded from ASHA account`);
+      } else if (mode === 'lens') {
+        showToast('Smartphone Lens', '20D Ophthalmoscopy adapter active');
+      }
+
       applyPatientData(currentPatient);
       renderPatientSelectList();
     }

@@ -180,56 +180,64 @@
         </div>
       </div>
 
-      <!-- 2. Quick Action Tiles (Instantly Connected to Eye & Sugar Check / Queue / Registration) -->
+      <!-- 2. IMAGE CAPTURE SECTION (Smartphone Lens Adapter & Direct Eye Photo Upload) -->
       <div class="space-y-2.5">
-        <!-- Big Primary Action: New Screening (Links directly to Retina Scan & AI Triage) -->
-        <div class="flex gap-2">
-          <a href="/retina-scan" class="flex-1 bg-retisync-blue hover:bg-retisync-blue-hover text-white rounded-2xl p-4 shadow-sm flex items-center justify-between tap-active transition-transform" title="Launch Retina Scan & AI Triage">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-[28px] text-white">document_scanner</span>
-              </div>
-              <div class="flex flex-col text-left">
-                <span class="font-serif font-bold text-[17px] text-white leading-tight">New Screening</span>
-                <span class="text-[12px] text-blue-100">Retinal scan &amp; blood glucose</span>
-              </div>
+        <div class="flex items-center justify-between px-0.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">IMAGE CAPTURE &amp; SCREENING</span>
+          <span class="px-2 py-0.5 rounded-md bg-[#e0edff] text-retisync-blue text-[10.5px] font-bold">High Resolution</span>
+        </div>
+
+        <!-- Two Primary Capture Tiles: Smartphone Lens vs Upload Eye Photo -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- Smartphone Lens -->
+          <a href="/retina-scan?mode=lens" class="bg-white border-2 border-retisync-blue rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-active transition-all group" title="Launch Smartphone Lens Adapter (20D)">
+            <div class="w-11 h-11 rounded-full bg-[#e0edff] text-retisync-blue flex items-center justify-center mb-0.5 group-hover:scale-105 transition-transform">
+              <span class="material-symbols-outlined text-[24px]">camera_alt</span>
             </div>
-            <span class="material-symbols-outlined text-white text-[24px]">arrow_forward</span>
+            <span class="font-bold text-[13px] text-slate-900 leading-tight">Smartphone Lens</span>
+            <span class="text-[11px] font-semibold text-retisync-blue">Adapter (20D)</span>
           </a>
-          <!-- Quick Camera Simulator Launch -->
-          <button id="openScreeningBtn" class="px-3.5 bg-retisync-navy hover:bg-slate-800 text-white rounded-2xl flex flex-col items-center justify-center shrink-0 tap-active transition-all cursor-pointer" title="Quick AI Camera Scanner">
-            <span class="material-symbols-outlined text-[22px] text-blue-300">center_focus_strong</span>
-            <span class="text-[10px] font-bold text-blue-200 mt-0.5">Quick AI</span>
+
+          <!-- Upload Eye Photo -->
+          <button onclick="triggerAshaUpload()" type="button" class="bg-white border border-slate-200/90 hover:border-retisync-blue rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-active transition-all cursor-pointer group" title="Upload DICOM / JPG Eye Photo">
+            <div class="w-11 h-11 rounded-full bg-slate-100 text-slate-600 group-hover:text-retisync-blue group-hover:bg-[#e0edff] flex items-center justify-center mb-0.5 transition-colors">
+              <span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+            </div>
+            <span class="font-bold text-[13px] text-slate-900 leading-tight">Upload Eye Photo</span>
+            <span class="text-[11px] text-slate-500">DICOM / JPG File</span>
           </button>
         </div>
+
+        <!-- Hidden input for instant file selection in ASHA portal -->
+        <input id="ashaEyeUploadInput" type="file" accept="image/*" class="hidden" onchange="handleAshaFileSelected(event)"/>
 
         <!-- Two-column Secondary Actions -->
         <div class="grid grid-cols-2 gap-2.5">
           <!-- Scan Queue -->
-          <button id="openQueueBtn" class="bg-white hover:bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between min-h-[110px] tap-active transition-transform text-left cursor-pointer" type="button">
+          <button id="openQueueBtn" class="bg-white hover:bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between min-h-[96px] tap-active transition-transform text-left cursor-pointer" type="button">
             <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl bg-retisync-ice text-retisync-blue flex items-center justify-center">
-                <span class="material-symbols-outlined text-[22px]">view_timeline</span>
+              <div class="w-9 h-9 rounded-xl bg-retisync-ice text-retisync-blue flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">view_timeline</span>
               </div>
               <span id="urgentBadge" class="px-2 py-0.5 rounded-full bg-retisync-alert-red text-white text-[10.5px] font-bold">8 Urgent</span>
             </div>
             <div class="mt-2">
-              <span class="font-serif font-bold text-[14.5px] text-slate-900 block leading-tight">Scan Queue</span>
-              <span class="text-[11.5px] text-slate-500">Triage list</span>
+              <span class="font-serif font-bold text-[14px] text-slate-900 block leading-tight">Scan Queue</span>
+              <span class="text-[11px] text-slate-500">Triage priority list</span>
             </div>
           </button>
 
           <!-- Register Patient -->
-          <button id="openRegisterBtn" class="bg-white hover:bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between min-h-[110px] tap-active transition-transform text-left cursor-pointer" type="button">
+          <button id="openRegisterBtn" class="bg-white hover:bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between min-h-[96px] tap-active transition-transform text-left cursor-pointer" type="button">
             <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl bg-retisync-ice text-retisync-blue flex items-center justify-center">
-                <span class="material-symbols-outlined text-[22px]">person_add</span>
+              <div class="w-9 h-9 rounded-xl bg-retisync-ice text-retisync-blue flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">person_add</span>
               </div>
-              <span class="material-symbols-outlined text-retisync-blue text-[20px]">add</span>
+              <span class="material-symbols-outlined text-retisync-blue text-[18px]">add</span>
             </div>
             <div class="mt-2">
-              <span class="font-serif font-bold text-[14.5px] text-slate-900 block leading-tight">Register Patient</span>
-              <span class="text-[11.5px] text-slate-500">ABHA / Village ID</span>
+              <span class="font-serif font-bold text-[14px] text-slate-900 block leading-tight">Register Patient</span>
+              <span class="text-[11px] text-slate-500">ABHA / Village ID</span>
             </div>
           </button>
         </div>
@@ -1005,6 +1013,36 @@
       doctorCallModal.classList.add('hidden');
       doctorCallModal.classList.remove('flex');
     });
+
+    // ============================================================
+    // ASHA EYE PHOTO UPLOAD & LENS WORKFLOW
+    // ============================================================
+    function triggerAshaUpload() {
+      const fileInput = document.getElementById('ashaEyeUploadInput');
+      if (fileInput) fileInput.click();
+    }
+
+    function handleAshaFileSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      showToast("Reading Eye Image...", `${file.name} selected. Preparing AI Triage...`);
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          sessionStorage.setItem('retisync_uploaded_eye_photo', e.target.result);
+          sessionStorage.setItem('retisync_uploaded_eye_photo_name', file.name);
+        } catch(err) {
+          console.warn('Session storage quota warning, proceeding anyway', err);
+        }
+        showToast("Retina Image Loaded", "Navigating to Retina Scan & AI Triage...");
+        setTimeout(() => {
+          window.location.href = '/retina-scan?mode=upload';
+        }, 500);
+      };
+      reader.readAsDataURL(file);
+    }
   </script>
 </body>
 </html>
