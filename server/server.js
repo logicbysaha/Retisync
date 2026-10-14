@@ -40,6 +40,11 @@ app.use('/api/sync', syncRoutes);
 app.use('/api/telehealth', telehealthRoutes);
 app.use('/api/ultralytics', ultralyticsRoutes);
 
+// Developer Dashboard
+app.get('/dev-dashboard', (req, res) => {
+  res.sendFile(path.join(ROOT_DIR, 'dev-dashboard.html'));
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
@@ -324,6 +329,7 @@ app.listen(PORT, () => {
   console.log(`🔐 Login Portal: http://localhost:${PORT}/login.html`);
   console.log(`🩺 Patient Portal: http://localhost:${PORT}/patient-home.html`);
   console.log(`📋 ASHA Worker Portal: http://localhost:${PORT}/asha-home.html`);
+  console.log(`⚙️  Developer Dashboard: http://localhost:${PORT}/dev-dashboard`);
   console.log(`=======================================================`);
 });
 

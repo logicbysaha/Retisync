@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RetiSync Developer Dashboard | Admin Console</title>
+  <meta name="description" content="Full-stack developer control panel for RetiSync Drishti Care — AI-powered rural diabetic retinopathy screening system."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; background: #060d1f; }
+    code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 2px; }
+
+    /* Dark Glass Card */
+    .glass-card {
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+    }
+
+    /* Neon Gradient Text */
+    .grad-text {
+      background: linear-gradient(135deg, #818cf8 0%, #38bdf8 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Sidebar active */
+    .nav-active {
+      background: linear-gradient(90deg, rgba(99,102,241,0.18) 0%, transparent 100%);
+      border-left: 3px solid #818cf8;
+      color: #a5b4fc;
+    }
+    .nav-item {
+      border-left: 3px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.04);
+      color: #cbd5e1;
+    }
+
+    /* Status Pulse */
+    .pulse-green { animation: pulseGreen 2s infinite; }
+    @keyframes pulseGreen {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+      50% { box-shadow: 0 0 0 5px rgba(52, 211, 153, 0); }
+    }
+
+    /* Metric Card Glow */
+    .metric-glow-blue { box-shadow: 0 0 20px rgba(99,102,241,0.1), inset 0 0 20px rgba(99,102,241,0.03); }
+    .metric-glow-green { box-shadow: 0 0 20px rgba(52,211,153,0.1), inset 0 0 20px rgba(52,211,153,0.03); }
+    .metric-glow-amber { box-shadow: 0 0 20px rgba(251,191,36,0.1), inset 0 0 20px rgba(251,191,36,0.03); }
+    .metric-glow-red { box-shadow: 0 0 20px rgba(239,68,68,0.1), inset 0 0 20px rgba(239,68,68,0.03); }
+    .metric-glow-purple { box-shadow: 0 0 20px rgba(168,85,247,0.1), inset 0 0 20px rgba(168,85,247,0.03); }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.07);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1s ease-out;
+    }
+
+    /* Table rows */
+    .data-row:hover { background: rgba(255,255,255,0.025); }
+
+    /* Mini chart bars */
+    .chart-bar {
+      width: 8px;
+      border-radius: 3px 3px 0 0;
+      background: linear-gradient(to top, #4f46e5, #818cf8);
+      align-self: flex-end;
+      transition: all 0.3s ease;
+    }
+    .chart-bar:hover { background: linear-gradient(to top, #6366f1, #a5b4fc); }
+
+    /* API endpoint badge */
+    .badge-get { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+    .badge-post { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+    .badge-delete { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+    /* Section animations */
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Sidebar */
+    .sidebar { width: 240px; flex-shrink: 0; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .mobile-header { display: flex !important; }
+    }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen antialiased">
+
+  <!-- Top Banner -->
+  <div id="topBanner" class="w-full bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-blue-900/60 border-b border-white/5 px-6 py-2.5 flex items-center justify-between text-xs">
+    <div class="flex items-center gap-2.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-green inline-block"></span>
+      <span class="text-slate-300 font-medium">RetiSync Drishti Care · Backend API Server Running on <span class="mono text-indigo-300">http://localhost:3000</span></span>
+    </div>
+    <div class="flex items-center gap-3 text-slate-400">
+      <span class="mono">v1.0.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/25 px-2 py-0.5 rounded">Developer Console</span>
+    </div>
+  </div>
+
+  <div class="flex min-h-[calc(100vh-38px)]">
+
+    <!-- Sidebar -->
+    <aside class="sidebar bg-[#080f23] border-r border-white/5 flex flex-col py-4 sticky top-[38px] h-[calc(100vh-38px)] overflow-y-auto">
+      <!-- Logo -->
+      <div class="px-5 pb-5 border-b border-white/5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <span class="material-symbols-outlined text-[17px] text-white">visibility</span>
+          </div>
+          <div>
+            <div class="font-bold text-[13px] text-white">RetiSync</div>
+            <div class="text-[10px] text-slate-500 mono">DRISHTI CARE · DEV</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="mt-4 flex-1 px-2 space-y-0.5">
+        <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-600">Overview</div>
+        <button onclick="showSection('overview')" class="nav-item nav-active w-full text-left px-3 py-2 rounded-lg text-[13px] flex items-center gap-2.5" data-section="overview">
+          <span class="material-symbols-outlined text-[18px]">dashboard</span> Overview
+        </button>
+        <button onclick="showSection('patients')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="patients">
+          <span class="material-symbols-outlined text-[18px]">group</span> Patients
+        </button>
+        <button onclick="showSection('screenings')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="screenings">
+          <span class="material-symbols-outlined text-[18px]">biotech</span> Screenings
+        </button>
+
+        <div class="px-3 py-1.5 mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">AI Engine</div>
+        <button onclick="showSection('ultralytics')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="ultralytics">
+          <span class="material-symbols-outlined text-[18px]">psychology</span> Ultralytics AI
+        </button>
+        <button onclick="showSection('workflow')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="workflow">
+          <span class="material-symbols-outlined text-[18px]">account_tree</span> Workflow Runner
+        </button>
+
+        <div class="px-3 py-1.5 mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">Field Operations</div>
+        <button onclick="showSection('asha')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="asha">
+          <span class="material-symbols-outlined text-[18px]">person_pin_circle</span> ASHA Worker
+        </button>
+        <button onclick="showSection('queue')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="queue">
+          <span class="material-symbols-outlined text-[18px]">format_list_numbered</span> Triage Queue
+        </button>
+        <button onclick="showSection('sync')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="sync">
+          <span class="material-symbols-outlined text-[18px]">cloud_sync</span> Sync & Vault
+        </button>
+
+        <div class="px-3 py-1.5 mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">Developer</div>
+        <button onclick="showSection('api')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="api">
+          <span class="material-symbols-outlined text-[18px]">code</span> API Explorer
+        </button>
+        <button onclick="showSection('database')" class="nav-item w-full text-left px-3 py-2 rounded-lg text-[13px] text-slate-400 flex items-center gap-2.5" data-section="database">
+          <span class="material-symbols-outlined text-[18px]">storage</span> Database Viewer
+        </button>
+      </nav>
+
+      <!-- Bottom: Navigation Links to App Pages -->
+      <div class="px-2 pt-4 border-t border-white/5 mt-auto space-y-0.5">
+        <div class="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">App Portals</div>
+        <a href="/login" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-slate-400">
+          <span class="material-symbols-outlined text-[16px]">lock</span> Login Portal
+        </a>
+        <a href="/patient-home" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-slate-400">
+          <span class="material-symbols-outlined text-[16px]">personal_injury</span> Patient Home
+        </a>
+        <a href="/asha-home" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-slate-400">
+          <span class="material-symbols-outlined text-[16px]">health_and_safety</span> ASHA Home
+        </a>
+        <a href="/api-docs" target="_blank" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-indigo-400">
+          <span class="material-symbols-outlined text-[16px]">open_in_new</span> REST API Console
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 overflow-y-auto">
+      <!-- Mobile Header -->
+      <div class="mobile-header hidden items-center gap-3 px-4 py-3 border-b border-white/5 bg-[#080f23] sticky top-0 z-40">
+        <button onclick="document.querySelector('.sidebar').classList.toggle('hidden')" class="text-slate-400">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <span class="font-bold text-white text-sm">RetiSync Dev Dashboard</span>
+      </div>
+
+      <div class="p-6 max-w-[1400px]">
+
+        <!-- ==================================== OVERVIEW SECTION ==================================== -->
+        <section id="sec-overview" class="section active space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold text-white">System Overview</h2>
+              <p class="text-slate-400 text-sm mt-0.5">Real-time RetiSync Drishti Care backend telemetry</p>
+            </div>
+            <button onclick="refreshAll()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/25 text-xs font-semibold transition-all">
+              <span class="material-symbols-outlined text-[15px]">refresh</span> Refresh All
+            </button>
+          </div>
+
+          <!-- System Status Bar -->
+          <div class="glass-card p-4 flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span id="sysStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-green"></span>
+              <span id="sysStatusText" class="text-sm font-bold text-white">API Server Healthy</span>
+            </div>
+            <div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+            <span class="text-[12px] text-slate-400">Uptime: <span id="serverUptime" class="mono text-emerald-300">—</span></span>
+            <div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+            <span class="text-[12px] text-slate-400">DB: <span id="dbStatusText" class="mono text-emerald-300">Connected</span></span>
+            <div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+            <span class="text-[12px] text-slate-400">Ultralytics: <span id="ultralyticsStatusText" class="mono text-indigo-300">Checking...</span></span>
+            <div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+            <span class="text-[12px] text-slate-400">Last refresh: <span id="lastRefreshTime" class="mono text-slate-300">—</span></span>
+          </div>
+
+          <!-- Metric Cards Row 1 -->
+          <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-4">
+            <div class="glass-card metric-glow-blue p-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Patients</div>
+                  <div id="metricPatients" class="text-3xl font-black text-white mt-1">—</div>
+                  <div class="text-[11px] text-slate-500 mt-1">Registered villagers</div>
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[19px] text-indigo-400">group</span>
+                </div>
+              </div>
+              <div class="progress-bar mt-3">
+                <div class="progress-fill bg-indigo-500" style="width: 100%"></div>
+              </div>
+            </div>
+
+            <div class="glass-card metric-glow-green p-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">AI Screenings</div>
+                  <div id="metricScreenings" class="text-3xl font-black text-white mt-1">—</div>
+                  <div class="text-[11px] text-slate-500 mt-1">Total run</div>
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-400">biotech</span>
+                </div>
+              </div>
+              <div class="progress-bar mt-3">
+                <div class="progress-fill bg-emerald-500" style="width: 80%"></div>
+              </div>
+            </div>
+
+            <div class="glass-card metric-glow-amber p-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Today Screened</div>
+                  <div id="metricScreenedToday" class="text-3xl font-black text-white mt-1">—</div>
+                  <div class="text-[11px] text-slate-500 mt-1">of <span id="metricTotal">24</span> assigned</div>
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[19px] text-amber-400">today</span>
+                </div>
+              </div>
+              <div class="progress-bar mt-3">
+                <div id="progressToday" class="progress-fill bg-amber-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="glass-card metric-glow-red p-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Urgent Cases</div>
+                  <div id="metricUrgent" class="text-3xl font-black text-white mt-1">—</div>
+                  <div class="text-[11px] text-red-400 mt-1 text-[11px]">Needs attention today</div>
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[19px] text-red-400">crisis_alert</span>
+                </div>
+              </div>
+              <div class="progress-bar mt-3">
+                <div class="progress-fill bg-red-500" style="width: 60%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Inline stats + AI status -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+            <!-- Glucose Distribution Mini Chart -->
+            <div class="glass-card p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <div class="font-bold text-white text-[14px]">Glucose Distribution</div>
+                  <div class="text-[11px] text-slate-500">Patient population risk</div>
+                </div>
+                <span class="material-symbols-outlined text-slate-600 text-[20px]">bar_chart</span>
+              </div>
+              <div class="flex items-end gap-1 h-20">
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="chart-bar" style="height: 25%; background: linear-gradient(to top, #10b981, #34d399);"></div>
+                  <span class="text-[9px] text-slate-500">Normal</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="chart-bar" style="height: 45%; background: linear-gradient(to top, #f59e0b, #fbbf24);"></div>
+                  <span class="text-[9px] text-slate-500">Pre-DM</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="chart-bar" style="height: 70%; background: linear-gradient(to top, #ef4444, #f87171);"></div>
+                  <span class="text-[9px] text-slate-500">High</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="chart-bar" style="height: 55%; background: linear-gradient(to top, #8b5cf6, #a78bfa);"></div>
+                  <span class="text-[9px] text-slate-500">Critical</span>
+                </div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-white/5 flex justify-between text-[11px]">
+                <span class="text-slate-400">Avg glucose (population)</span>
+                <span class="text-amber-400 font-bold">196 mg/dL</span>
+              </div>
+            </div>
+
+            <!-- DR Stage Breakdown -->
+            <div class="glass-card p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <div class="font-bold text-white text-[14px]">DR Stage Breakdown</div>
+                  <div class="text-[11px] text-slate-500">From AI screenings</div>
+                </div>
+                <span class="material-symbols-outlined text-slate-600 text-[20px]">donut_large</span>
+              </div>
+              <div id="drStageList" class="space-y-2.5">
+                <!-- populated by JS -->
+              </div>
+            </div>
+
+            <!-- Ultralytics AI Engine Card -->
+            <div class="glass-card p-5 border-indigo-500/15">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <div class="font-bold text-white text-[14px]">Ultralytics AI Engine</div>
+                  <div class="text-[11px] text-slate-500">Connected · platform.ultralytics.com</div>
+                </div>
+                <div id="ultralyticsIcon" class="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[19px] text-indigo-400">psychology</span>
+                </div>
+              </div>
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-slate-400">API Key</span>
+                  <span id="ultralyticsKeyDisplay" class="mono text-indigo-300">Loading...</span>
+                </div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-slate-400">Vision Model</span>
+                  <span class="mono text-emerald-300">yolo11n.pt</span>
+                </div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-slate-400">VLM</span>
+                  <span class="mono text-purple-300">gemini-nano-banana-2.1</span>
+                </div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-slate-400">Connection</span>
+                  <span id="ultralyticsConnectedBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400">Connected ✓</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Screenings Table -->
+          <div class="glass-card">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-white/5">
+              <div class="font-bold text-white text-[14px]">Recent AI Screenings</div>
+              <button onclick="showSection('screenings')" class="text-[12px] text-indigo-400 hover:text-indigo-300">View all →</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[12px]">
+                <thead>
+                  <tr class="border-b border-white/5">
+                    <th class="text-left px-5 py-3 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Patient</th>
+                    <th class="text-left px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">DR Stage</th>
+                    <th class="text-left px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Risk Score</th>
+                    <th class="text-left px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Glucose</th>
+                    <th class="text-left px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Confidence</th>
+                    <th class="text-left px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Scanned At</th>
+                  </tr>
+                </thead>
+                <tbody id="screeningsTableBody" class="divide-y divide-white/[0.04]">
+                  <tr><td colspan="6" class="px-5 py-6 text-center text-slate-600">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================== PATIENTS SECTION ==================================== -->
+        <section id="sec-patients" class="section space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold text-white">Patient Registry</h2>
+              <p class="text-slate-400 text-sm mt-0.5">All registered village patients in the Retisync health vault</p>
+            </div>
+            <button onclick="loadPatients()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/25 text-xs font-semibold transition-all">
+              <span class="material-symbols-outlined text-[15px]">refresh</span> Refresh
+            </button>
+          </div>
+          <div id="patientsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+            <div class="glass-card p-8 text-center text-slate-600 col-span-full">Loading patients...</div>
+          </div>
+        </section>
+
+        <!-- ==================================== SCREENINGS SECTION ==================================== -->
+        <section id="sec-screenings" class="section space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold text-white">AI Screening Records</h2>
+              <p class="text-slate-400 text-sm mt-0.5">All retinal & glycemic screenings run by the AI engine</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="runNewScreening()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/25 text-xs font-semibold transition-all">
+                <span class="material-symbols-outlined text-[15px]">add</span> Run New Screening
+              </button>
+              <button onclick="loadScreenings()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/25 text-xs font-semibold transition-all">
+                <span class="material-symbols-outlined text-[15px]">refresh</span>
+              </button>
+            </div>
+          </div>
+          <div class="glass-card overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-[12px]">
+                <thead>
+                  <tr class="border-b border-white/5">
+                    <th class="text-left px-5 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">ID</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Patient</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">DR Stage</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Risk%</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Glucose</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">BP</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Conf.</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Urgency</th>
+                    <th class="text-left px-4 py-3.5 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Scanned</th>
+                  </tr>
+                </thead>
+                <tbody id="allScreeningsTableBody" class="divide-y divide-white/[0.04]">
+                  <tr><td colspan="9" class="px-5 py-8 text-center text-slate-600">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================== ULTRALYTICS AI SECTION ==================================== -->
+        <section id="sec-ultralytics" class="section space-y-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[22px] text-indigo-400">psychology</span>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-white">Ultralytics AI Engine</h2>
+              <p class="text-slate-400 text-sm mt-0.5">Connected to <span class="mono text-indigo-300">platform.ultralytics.com/agents</span></p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-card p-5 metric-glow-purple">
+              <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-3">API Status</div>
+              <div id="ultralyticsFullStatus" class="space-y-2.5 text-[13px]">Loading...</div>
+            </div>
+            <div class="glass-card p-5 col-span-2">
+              <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-3">5-Step Workflow Pipeline</div>
+              <div id="workflowGraphViz" class="flex items-center gap-2 flex-wrap">
+                <!-- rendered by JS -->
+              </div>
+            </div>
+          </div>
+          <div class="glass-card p-5">
+            <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-3">Engine Capabilities</div>
+            <div id="capabilitiesList" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+          </div>
+        </section>
+
+        <!-- ==================================== WORKFLOW RUNNER ==================================== -->
+        <section id="sec-workflow" class="section space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white">Workflow Runner</h2>
+            <p class="text-slate-400 text-sm mt-0.5">Run the Ultralytics YOLO → VLM pipeline on any image</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Input Panel -->
+            <div class="glass-card p-5 space-y-4">
+              <div class="font-bold text-white text-[14px]">Input Configuration</div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Image Source (URL or path)</label>
+                <input id="wfImageInput" type="text" value="https://www.vrmny.com/wp-content/uploads/2021/12/npdr-vs-pdr.jpg" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm mono outline-none focus:border-indigo-500/50 focus:bg-white/8 transition-all"/>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">VLM Prompt</label>
+                <input id="wfPromptInput" type="text" value="Describe the scene in detail" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm outline-none focus:border-indigo-500/50 transition-all"/>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Min Persons</label>
+                  <input id="wfMinPersons" type="number" value="1" min="0" max="10" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm mono outline-none focus:border-indigo-500/50 transition-all"/>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Confidence</label>
+                  <input id="wfConfidence" type="number" value="0.25" min="0.1" max="0.9" step="0.05" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm mono outline-none focus:border-indigo-500/50 transition-all"/>
+                </div>
+              </div>
+              <button id="runWorkflowBtn" onclick="runWorkflow()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-[13px] flex items-center justify-center gap-2 transition-all">
+                <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                Run Ultralytics Workflow
+              </button>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="glass-card p-5 flex flex-col">
+              <div class="font-bold text-white text-[14px] mb-3">Execution Output</div>
+              <div id="workflowOutput" class="flex-1 bg-black/40 rounded-xl p-3 mono text-[11px] text-emerald-300 overflow-auto max-h-96 min-h-48">
+                // Click "Run Ultralytics Workflow" to execute the 5-step pipeline
+                // The result will appear here in structured JSON
+              </div>
+              <div id="workflowSummaryBar" class="hidden mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <div class="text-[12px] font-bold text-emerald-300 mb-1">Pipeline Result</div>
+                <div id="workflowSummaryText" class="text-[11px] text-slate-400"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================== ASHA SECTION ==================================== -->
+        <section id="sec-asha" class="section space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white">ASHA Worker Dashboard</h2>
+            <p class="text-slate-400 text-sm mt-0.5">Field worker performance and shift statistics</p>
+          </div>
+          <div id="ashaStatsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card p-4 col-span-full text-center text-slate-600 text-sm">Loading...</div>
+          </div>
+          <div class="glass-card p-5">
+            <div class="font-bold text-white text-[14px] mb-4">Field Worker Profile</div>
+            <div class="flex items-center gap-4">
+              <img src="sandhya_avatar.jpg" alt="Sandhya Didi" class="w-16 h-16 rounded-2xl object-cover border-2 border-indigo-500/30"/>
+              <div>
+                <div class="font-bold text-white text-[16px]">Sandhya Rani Mondal</div>
+                <div class="text-slate-400 text-[12px]">ASHA Health Worker · ID: WB-KOT-8821</div>
+                <div class="text-slate-400 text-[12px]">Bishnupur Sub-Center, Kotda Block</div>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span class="text-[11px] text-emerald-400 font-semibold">Active Shift</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================== QUEUE SECTION ==================================== -->
+        <section id="sec-queue" class="section space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white">Triage Queue</h2>
+            <p class="text-slate-400 text-sm mt-0.5">Live patient priority list sorted by clinical risk</p>
+          </div>
+          <div id="queueContainer" class="space-y-3">
+            <div class="glass-card p-8 text-center text-slate-600">Loading queue...</div>
+          </div>
+        </section>
+
+        <!-- ==================================== SYNC SECTION ==================================== -->
+        <section id="sec-sync" class="section space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white">Sync & Offline Vault</h2>
+            <p class="text-slate-400 text-sm mt-0.5">ABHA cloud synchronization and offline data management</p>
+          </div>
+          <div class="glass-card p-5">
+            <div class="flex items-center justify-between mb-5">
+              <div class="font-bold text-white text-[14px]">Vault Status</div>
+              <button id="fullSyncBtn" onclick="triggerFullSync()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all">
+                <span class="material-symbols-outlined text-[15px]">cloud_sync</span> Sync Now
+              </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-white/[0.03] rounded-xl p-4 border border-white/5">
+                <div class="text-[11px] text-slate-500 uppercase tracking-wider mb-1">Offline Records</div>
+                <div class="text-2xl font-black text-white">3</div>
+                <div class="text-[11px] text-amber-400 mt-1">Ready to push</div>
+              </div>
+              <div class="bg-white/[0.03] rounded-xl p-4 border border-white/5">
+                <div class="text-[11px] text-slate-500 uppercase tracking-wider mb-1">Last Sync</div>
+                <div id="lastSyncTime" class="text-[15px] font-bold text-white">Just now</div>
+                <div class="text-[11px] text-emerald-400 mt-1">Central vault reconciled</div>
+              </div>
+              <div class="bg-white/[0.03] rounded-xl p-4 border border-white/5">
+                <div class="text-[11px] text-slate-500 uppercase tracking-wider mb-1">ABHA Cloud</div>
+                <div class="text-[15px] font-bold text-emerald-400">Connected</div>
+                <div class="text-[11px] text-slate-500 mt-1">api.abdm.gov.in · TLS 1.3</div>
+              </div>
+            </div>
+            <div id="syncOutput" class="mt-4 hidden mono text-[11px] bg-black/40 rounded-xl p-3 text-emerald-300"></div>
+          </div>
+        </section>
+
+        <!-- ==================================== API EXPLORER ==================================== -->
+        <section id="sec-api" class="section space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white">API Explorer</h2>
+            <p class="text-slate-400 text-sm mt-0.5">Live test all RetiSync backend endpoints</p>
+          </div>
+
+          <!-- Endpoint List -->
+          <div class="space-y-3" id="apiEndpointList">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Response Console -->
+          <div class="glass-card">
+            <div class="flex items-center gap-2 px-5 py-3.5 border-b border-white/5">
+              <span class="w-3 h-3 rounded-full bg-red-500/70"></span>
+              <span class="w-3 h-3 rounded-full bg-yellow-500/70"></span>
+              <span class="w-3 h-3 rounded-full bg-green-500/70"></span>
+              <span class="mono text-[11px] text-slate-500 ml-2" id="consoleEndpointLabel">Live Response Console</span>
+              <span class="ml-auto text-[10px] mono" id="consoleResponseStatus"></span>
+            </div>
+            <pre id="apiConsoleOutput" class="p-5 mono text-[11px] text-emerald-300 overflow-x-auto max-h-80 min-h-32">// Click any endpoint above to test live API execution</pre>
+          </div>
+        </section>
+
+        <!-- ==================================== DATABASE SECTION ==================================== -->
+        <section id="sec-database" class="section space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold text-white">Database Viewer</h2>
+            <p class="text-slate-400 text-sm mt-0.5">Live inspection of the RetiSync in-memory database</p>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-[13px]">
+            <button onclick="loadDbCollection('patients')" class="glass-card p-4 text-left hover:border-indigo-500/30 transition-all">
+              <div class="text-indigo-400 font-bold text-lg" id="db-count-patients">—</div>
+              <div class="text-slate-400">Patients</div>
+            </button>
+            <button onclick="loadDbCollection('screenings')" class="glass-card p-4 text-left hover:border-emerald-500/30 transition-all">
+              <div class="text-emerald-400 font-bold text-lg" id="db-count-screenings">—</div>
+              <div class="text-slate-400">Screenings</div>
+            </button>
+            <button onclick="loadDbCollection('visits')" class="glass-card p-4 text-left hover:border-amber-500/30 transition-all">
+              <div class="text-amber-400 font-bold text-lg" id="db-count-visits">—</div>
+              <div class="text-slate-400">Visits</div>
+            </button>
+            <button onclick="loadDbCollection('camps')" class="glass-card p-4 text-left hover:border-purple-500/30 transition-all">
+              <div class="text-purple-400 font-bold text-lg" id="db-count-camps">—</div>
+              <div class="text-slate-400">Camps</div>
+            </button>
+          </div>
+
+          <div class="glass-card">
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
+              <span class="mono text-[12px] text-slate-400" id="dbCollectionLabel">Select a collection above</span>
+              <span class="text-[11px] text-slate-500" id="dbRecordCount"></span>
+            </div>
+            <pre id="dbOutput" class="p-5 mono text-[11px] text-sky-300 overflow-x-auto max-h-[500px]">// Click a collection to inspect its records</pre>
+          </div>
+        </section>
+
+      </div><!-- end max-w -->
+    </main>
+  </div>
+
+  <script>
+    // ============================================================
+    // STATE
+    // ============================================================
+    let _patients = [], _screenings = [], _queue = [], _health = {};
+
+    // ============================================================
+    // SECTION SWITCHER
+    // ============================================================
+    function showSection(name) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById('sec-' + name);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('[data-section]').forEach(btn => {
+        btn.classList.remove('nav-active');
+        btn.classList.add('text-slate-400');
+        btn.style.borderLeft = '3px solid transparent';
+      });
+      const activeBtn = document.querySelector(`[data-section="${name}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('nav-active');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      // Lazy-load on section visit
+      if (name === 'patients') loadPatients();
+      if (name === 'screenings') loadScreenings();
+      if (name === 'queue') loadQueue();
+      if (name === 'asha') loadAshaStats();
+      if (name === 'ultralytics') loadUltralyticsStatus();
+      if (name === 'database') loadDbHealth();
+      if (name === 'api') renderApiExplorer();
+    }
+
+    // ============================================================
+    // FORMAT HELPERS
+    // ============================================================
+    function timeAgo(iso) {
+      if (!iso) return '—';
+      const diff = Date.now() - new Date(iso).getTime();
+      const m = Math.floor(diff / 60000);
+      if (m < 1) return 'Just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h / 24)}d ago`;
+    }
+
+    function stageColor(code) {
+      if (!code && code !== 0) return 'text-slate-400';
+      if (code === 0) return 'text-emerald-400';
+      if (code === 1) return 'text-yellow-400';
+      if (code === 2) return 'text-orange-400';
+      return 'text-red-400';
+    }
+
+    function urgencyBadge(u) {
+      if (!u) return `<span class="px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 text-[10px]">—</span>`;
+      const map = { Immediate: 'bg-red-500/15 text-red-400', Priority: 'bg-amber-500/15 text-amber-400', Routine: 'bg-emerald-500/15 text-emerald-400', 'Follow-up': 'bg-blue-500/15 text-blue-400' };
+      return `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${map[u] || 'bg-slate-500/15 text-slate-400'}">${u}</span>`;
+    }
+
+    // ============================================================
+    // LOAD OVERVIEW
+    // ============================================================
+    async function refreshAll() {
+      try {
+        const [health, patients, screenings, asha, ultra] = await Promise.all([
+          fetch('/api/health').then(r => r.json()),
+          fetch('/api/patients').then(r => r.json()),
+          fetch('/api/screenings').then(r => r.json()),
+          fetch('/api/asha/dashboard').then(r => r.json()),
+          fetch('/api/ultralytics/status').then(r => r.json())
+        ]);
+
+        _health = health;
+        _patients = patients.patients || [];
+        _screenings = screenings.screenings || [];
+
+        // Status bar
+        const uptimeSec = health.uptimeSeconds || 0;
+        const uptimeMin = Math.floor(uptimeSec / 60);
+        document.getElementById('serverUptime').textContent = uptimeSec < 60 ? `${uptimeSec}s` : `${uptimeMin}m ${uptimeSec % 60}s`;
+        document.getElementById('dbStatusText').textContent = health.database?.status === 'connected' ? 'Connected ✓' : 'Error';
+        document.getElementById('ultralyticsStatusText').textContent = ultra.connected ? 'Connected ✓' : 'Disconnected';
+        document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('en-IN');
+
+        // Metrics
+        document.getElementById('metricPatients').textContent = health.database?.patientsCount ?? patients.count ?? '—';
+        document.getElementById('metricScreenings').textContent = health.database?.screeningsCount ?? screenings.count ?? '—';
+
+        if (asha.success && asha.stats) {
+          const s = asha.stats;
+          document.getElementById('metricScreenedToday').textContent = s.screenedToday;
+          document.getElementById('metricTotal').textContent = s.totalAssignedVillagers;
+          document.getElementById('metricUrgent').textContent = s.urgentCasesCount;
+          document.getElementById('progressToday').style.width = s.progressPercentage + '%';
+        }
+
+        // Ultralytics card
+        document.getElementById('ultralyticsKeyDisplay').textContent = ultra.apiKeyMasked || '—';
+        document.getElementById('ultralyticsConnectedBadge').textContent = ultra.connected ? 'Connected ✓' : 'Offline';
+
+        // DR Stage breakdown
+        const stages = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
+        _screenings.forEach(s => { stages[s.drStageCode] = (stages[s.drStageCode] || 0) + 1; });
+        const total = _screenings.length || 1;
+        const stageNames = ['No DR (Stage 0)', 'Mild NPDR', 'Moderate NPDR', 'Severe NPDR', 'PDR'];
+        const stageColors = ['bg-emerald-500', 'bg-yellow-500', 'bg-orange-500', 'bg-red-500', 'bg-rose-700'];
+        document.getElementById('drStageList').innerHTML = stageNames.map((n, i) => `
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11.5px]">
+              <span class="text-slate-400">${n}</span>
+              <span class="text-slate-300 font-semibold">${stages[i] || 0}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill ${stageColors[i]}" style="width: ${((stages[i] || 0) / total * 100).toFixed(0)}%"></div>
+            </div>
+          </div>
+        `).join('');
+
+        // Recent screenings table
+        const recent = _screenings.slice(0, 6);
+        document.getElementById('screeningsTableBody').innerHTML = recent.length
+          ? recent.map(s => `
+            <tr class="data-row">
+              <td class="px-5 py-3 mono text-[10px] text-slate-500">${s.id?.slice(-10) || '—'}</td>
+              <td class="px-4 py-3 font-semibold text-slate-200">${s.patientName}</td>
+              <td class="px-4 py-3 ${stageColor(s.drStageCode)} font-semibold">${s.drStage?.replace('Stage ', 'S')?.replace(': ', ' ') || '—'}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-14 progress-bar">
+                    <div class="progress-fill ${s.retinopathyRiskScore >= 75 ? 'bg-red-500' : s.retinopathyRiskScore >= 50 ? 'bg-amber-500' : 'bg-emerald-500'}" style="width: ${s.retinopathyRiskScore}%"></div>
+                  </div>
+                  <span class="text-slate-300 text-[11px]">${s.retinopathyRiskScore}%</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-slate-300">${s.glucoseReading} mg/dL</td>
+              <td class="px-4 py-3 text-[11px] text-slate-400">${s.confidence}%</td>
+              <td class="px-4 py-3 text-[11px] text-slate-500">${timeAgo(s.scannedAt)}</td>
+            </tr>
+          `).join('')
+          : `<tr><td colspan="7" class="px-5 py-8 text-center text-slate-600">No screenings yet</td></tr>`;
+
+      } catch (e) {
+        console.error('Dashboard refresh error:', e);
+        document.getElementById('sysStatusText').textContent = 'API Connection Error';
+        document.getElementById('sysStatusDot').className = 'w-2.5 h-2.5 rounded-full bg-red-500 inline-block';
+      }
+    }
+
+    // ============================================================
+    // PATIENTS
+    // ============================================================
+    async function loadPatients() {
+      const grid = document.getElementById('patientsGrid');
+      grid.innerHTML = '<div class="glass-card p-8 text-center text-slate-600 col-span-full">Loading...</div>';
+      try {
+        const data = await fetch('/api/patients').then(r => r.json());
+        _patients = data.patients || [];
+        grid.innerHTML = _patients.map(p => `
+          <div class="glass-card p-5 hover:border-indigo-500/25 transition-all">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full bg-indigo-500/15 flex items-center justify-center text-indigo-300 font-bold text-[16px] shrink-0">
+                  ${p.name.split(' ').map(w => w[0]).join('').slice(0,2)}
+                </div>
+                <div>
+                  <div class="font-bold text-white text-[14px]">${p.name} <span class="text-slate-500 text-[11px]">(${p.age}${p.gender})</span></div>
+                  <div class="text-slate-500 text-[11px]">${p.ward} · ${p.subCenter || 'Sub-Center'}</div>
+                </div>
+              </div>
+              <span class="mono text-[10px] text-slate-600 shrink-0">${p.id}</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-[11px]">
+              <div class="bg-white/[0.03] rounded-lg p-2 text-center">
+                <div class="text-slate-500">ABHA</div>
+                <div class="font-mono text-slate-300 mt-0.5">${p.abhaId || '—'}</div>
+              </div>
+              <div class="bg-white/[0.03] rounded-lg p-2 text-center">
+                <div class="text-slate-500">Risk Score</div>
+                <div class="font-bold ${p.currentRiskScore >= 75 ? 'text-red-400' : p.currentRiskScore >= 50 ? 'text-amber-400' : 'text-emerald-400'} mt-0.5">${p.currentRiskScore || '—'}%</div>
+              </div>
+              <div class="bg-white/[0.03] rounded-lg p-2 text-center">
+                <div class="text-slate-500">Glucose Logs</div>
+                <div class="font-bold text-slate-300 mt-0.5">${p.glucoseHistory?.length || 0}</div>
+              </div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-white/[0.05]">
+              <div class="text-[11px] text-slate-500 truncate">${p.actionAdvised || p.riskLevel || 'No current advisory'}</div>
+            </div>
+            <a href="/patient-profile?patient=${encodeURIComponent(p.name)}" class="mt-3 flex items-center gap-1.5 text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold">
+              <span class="material-symbols-outlined text-[14px]">open_in_new</span> View Patient Profile
+            </a>
+          </div>
+        `).join('') || '<div class="glass-card p-8 text-center text-slate-600 col-span-full">No patients found</div>';
+      } catch(e) {
+        grid.innerHTML = '<div class="glass-card p-8 text-center text-red-500 col-span-full">Error loading patients</div>';
+      }
+    }
+
+    // ============================================================
+    // SCREENINGS
+    // ============================================================
+    async function loadScreenings() {
+      const tbody = document.getElementById('allScreeningsTableBody');
+      tbody.innerHTML = '<tr><td colspan="9" class="px-5 py-8 text-center text-slate-600">Loading...</td></tr>';
+      try {
+        const data = await fetch('/api/screenings').then(r => r.json());
+        _screenings = data.screenings || [];
+        tbody.innerHTML = _screenings.map(s => `
+          <tr class="data-row">
+            <td class="px-5 py-3 mono text-[10px] text-slate-500">${s.id?.slice(-8)}</td>
+            <td class="px-4 py-3 font-semibold text-slate-200">${s.patientName}</td>
+            <td class="px-4 py-3 ${stageColor(s.drStageCode)} font-semibold text-[12px]">${s.drStage?.replace('Stage ', 'S') || '—'}</td>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-1.5">
+                <div class="w-10 progress-bar"><div class="progress-fill ${s.retinopathyRiskScore>=75?'bg-red-500':s.retinopathyRiskScore>=50?'bg-amber-500':'bg-emerald-500'}" style="width:${s.retinopathyRiskScore}%"></div></div>
+                <span class="text-[11px] text-slate-300">${s.retinopathyRiskScore}%</span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-slate-300">${s.glucoseReading} mg/dL</td>
+            <td class="px-4 py-3 text-slate-400 text-[11px]">${s.bloodPressure || '—'}</td>
+            <td class="px-4 py-3 text-slate-300">${s.confidence}%</td>
+            <td class="px-4 py-3">${urgencyBadge(s.urgency)}</td>
+            <td class="px-4 py-3 text-[11px] text-slate-500">${timeAgo(s.scannedAt)}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="9" class="px-5 py-8 text-center text-slate-600">No screenings found</td></tr>';
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-5 py-8 text-center text-red-500">Error loading screenings</td></tr>';
+      }
+    }
+
+    async function runNewScreening() {
+      try {
+        const res = await fetch('/api/screenings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ patientName: 'Rabin Das (54M)', glucose: 175 })
+        });
+        const data = await res.json();
+        await loadScreenings();
+        await refreshAll();
+      } catch(e) {}
+    }
+
+    // ============================================================
+    // QUEUE
+    // ============================================================
+    async function loadQueue() {
+      const container = document.getElementById('queueContainer');
+      container.innerHTML = '<div class="glass-card p-8 text-center text-slate-600">Loading queue...</div>';
+      try {
+        const data = await fetch('/api/asha/queue').then(r => r.json());
+        _queue = data.queue || [];
+        container.innerHTML = _queue.map((q, i) => `
+          <div class="glass-card p-4 flex items-center gap-4 hover:border-white/10 transition-all">
+            <div class="w-10 h-10 rounded-full ${i === 0 ? 'bg-red-500/20 text-red-400' : i === 1 ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'} flex items-center justify-center font-black text-[16px] shrink-0">
+              ${i + 1}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-bold text-white text-[14px]">${q.demographics}</div>
+              <div class="text-slate-400 text-[11.5px]">${q.ward}</div>
+              <div class="text-slate-500 text-[11px] mt-0.5">${q.description}</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="text-right">
+                <div class="text-[11px] text-slate-500">Risk</div>
+                <div class="font-black ${q.riskScore>=75?'text-red-400':q.riskScore>=50?'text-amber-400':'text-emerald-400'}">${q.riskScore}%</div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[10.5px] font-bold ${q.priorityClass}">${q.priorityBadge}</span>
+              <a href="/eye-sugar-check?patient=${encodeURIComponent(q.name)}&glucose=${q.latestGlucose}" class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-[11px] font-bold border border-indigo-500/25 transition-all">
+                Scan →
+              </a>
+            </div>
+          </div>
+        `).join('') || '<div class="glass-card p-8 text-center text-slate-600">Queue empty</div>';
+      } catch(e) {
+        container.innerHTML = '<div class="glass-card p-8 text-center text-red-500">Error loading queue</div>';
+      }
+    }
+
+    // ============================================================
+    // ASHA STATS
+    // ============================================================
+    async function loadAshaStats() {
+      try {
+        const data = await fetch('/api/asha/dashboard').then(r => r.json());
+        const s = data.stats || {};
+        const grid = document.getElementById('ashaStatsGrid');
+        grid.innerHTML = [
+          { label: 'Assigned Today', value: s.totalAssignedVillagers, color: 'text-indigo-400' },
+          { label: 'Screened Today', value: s.screenedToday, color: 'text-emerald-400' },
+          { label: 'Pending', value: s.pendingToday, color: 'text-amber-400' },
+          { label: 'Urgent Cases', value: s.urgentCasesCount, color: 'text-red-400' },
+        ].map(m => `
+          <div class="glass-card p-5 text-center">
+            <div class="text-3xl font-black ${m.color}">${m.value ?? '—'}</div>
+            <div class="text-[12px] text-slate-400 mt-1">${m.label}</div>
+          </div>
+        `).join('');
+      } catch(e) {}
+    }
+
+    // ============================================================
+    // ULTRALYTICS
+    // ============================================================
+    async function loadUltralyticsStatus() {
+      try {
+        const data = await fetch('/api/ultralytics/status').then(r => r.json());
+        const statusDiv = document.getElementById('ultralyticsFullStatus');
+        statusDiv.innerHTML = `
+          <div class="space-y-2.5">
+            <div class="flex justify-between text-[12px]"><span class="text-slate-400">Status</span><span class="text-emerald-400 font-bold">${data.connected ? '● Connected' : '○ Offline'}</span></div>
+            <div class="flex justify-between text-[12px]"><span class="text-slate-400">API Key</span><span class="mono text-indigo-300">${data.apiKeyMasked}</span></div>
+            <div class="flex justify-between text-[12px]"><span class="text-slate-400">YOLO Model</span><span class="mono text-sky-300">${data.model}</span></div>
+            <div class="flex justify-between text-[12px]"><span class="text-slate-400">VLM Model</span><span class="mono text-purple-300">${data.vlmModel}</span></div>
+            <div class="flex justify-between text-[12px]"><span class="text-slate-400">Platform</span><a href="https://platform.ultralytics.com/agents" target="_blank" class="text-indigo-400 hover:underline text-[11px]">ultralytics.com/agents ↗</a></div>
+          </div>`;
+
+        // Workflow graph viz
+        const nodes = [
+          { icon: 'image', label: 'Input Image', color: 'text-slate-300 border-slate-500/30 bg-slate-500/10' },
+          { icon: 'search', label: 'YOLO Detect', color: 'text-sky-300 border-sky-500/30 bg-sky-500/10' },
+          { icon: 'swap_horiz', label: 'Condition Gate', color: 'text-amber-300 border-amber-500/30 bg-amber-500/10' },
+          { icon: 'psychology', label: 'Describe Scene', color: 'text-purple-300 border-purple-500/30 bg-purple-500/10' },
+          { icon: 'output', label: 'Output', color: 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10' },
+        ];
+        document.getElementById('workflowGraphViz').innerHTML = nodes.map((n, i) => `
+          <div class="flex items-center gap-2">
+            <div class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border ${n.color}">
+              <span class="material-symbols-outlined text-[18px]">${n.icon}</span>
+              <span class="text-[10px] font-bold text-center leading-tight max-w-[70px]">${n.label}</span>
+            </div>
+            ${i < nodes.length - 1 ? '<span class="text-slate-600 text-[18px]">→</span>' : ''}
+          </div>
+        `).join('');
+
+        // Capabilities
+        document.getElementById('capabilitiesList').innerHTML = (data.capabilities || []).map(c => `
+          <div class="bg-indigo-500/10 border border-indigo-500/15 rounded-xl p-3 text-[12px] text-indigo-300 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span> ${c}
+          </div>
+        `).join('');
+
+      } catch(e) {}
+    }
+
+    // ============================================================
+    // WORKFLOW RUNNER
+    // ============================================================
+    async function runWorkflow() {
+      const btn = document.getElementById('runWorkflowBtn');
+      const output = document.getElementById('workflowOutput');
+      const summary = document.getElementById('workflowSummaryBar');
+      const summaryText = document.getElementById('workflowSummaryText');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin material-symbols-outlined text-[18px]">autorenew</span> Running Pipeline...';
+      output.textContent = '// Executing Ultralytics Agent 5-step workflow...\n// Step 1: Input image resolved\n// Step 2: Running YOLO detection...\n// Step 3: Evaluating condition gate...\n// Step 4: VLM scene analysis...\n// Awaiting result...';
+      summary.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/ultralytics/workflow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_path: document.getElementById('wfImageInput').value,
+            prompt: document.getElementById('wfPromptInput').value,
+            min_person_count: parseInt(document.getElementById('wfMinPersons').value),
+            confidence_threshold: parseFloat(document.getElementById('wfConfidence').value)
+          })
+        });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+
+        if (data.summary) {
+          summary.classList.remove('hidden');
+          const sum = data.summary;
+          summaryText.innerHTML = `
+            Person Detected: <strong class="text-white">${sum.person_detected ? 'Yes (' + sum.person_count + ')' : 'No (condition gate closed)'}</strong> ·
+            Execution: <strong class="text-white">${data.execution_time_seconds}s</strong>
+            ${sum.scene_description ? `<br/><span class="text-slate-400">"${sum.scene_description.slice(0, 120)}..."</span>` : ''}
+          `;
+        }
+      } catch(e) {
+        output.textContent = `// Error: ${e.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">play_arrow</span> Run Ultralytics Workflow';
+      }
+    }
+
+    // ============================================================
+    // API EXPLORER
+    // ============================================================
+    const API_ENDPOINTS = [
+      { method: 'GET', path: '/api/health', desc: 'Server health & DB status', body: null },
+      { method: 'GET', path: '/api/patients', desc: 'All registered patients', body: null },
+      { method: 'GET', path: '/api/patients/pat-001', desc: 'Patient #pat-001 full record', body: null },
+      { method: 'POST', path: '/api/patients/pat-001/glucose', desc: 'Log glucose reading', body: { value: 245, timing: 'Post-Meal' } },
+      { method: 'GET', path: '/api/patients/pat-001/risk', desc: 'Retinopathy risk score', body: null },
+      { method: 'GET', path: '/api/screenings', desc: 'All AI screenings', body: null },
+      { method: 'POST', path: '/api/screenings', desc: 'Run new AI retinal triage', body: { patientName: 'Rabin Das (54M)', glucose: 178 } },
+      { method: 'GET', path: '/api/asha/dashboard', desc: 'ASHA shift stats', body: null },
+      { method: 'GET', path: '/api/asha/queue', desc: 'Live triage priority queue', body: null },
+      { method: 'POST', path: '/api/sync', desc: 'Offline vault 2-way sync', body: { offlineRecords: [] } },
+      { method: 'GET', path: '/api/ultralytics/status', desc: 'Ultralytics AI engine status', body: null },
+      { method: 'POST', path: '/api/ultralytics/workflow', desc: 'Run YOLO → VLM pipeline', body: { prompt: 'Describe the scene', min_person_count: 1 } },
+    ];
+
+    function renderApiExplorer() {
+      const list = document.getElementById('apiEndpointList');
+      list.innerHTML = API_ENDPOINTS.map((ep, i) => `
+        <div class="glass-card p-4 flex items-center justify-between gap-3 hover:border-white/10 transition-all">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="text-[10.5px] font-bold px-2 py-0.5 rounded ${ep.method === 'GET' ? 'badge-get' : ep.method === 'POST' ? 'badge-post' : 'badge-delete'}">${ep.method}</span>
+            <span class="mono text-[12px] text-slate-300 truncate">${ep.path}</span>
+            <span class="text-[11px] text-slate-600 hidden md:inline">${ep.desc}</span>
+          </div>
+          <button onclick="testApiEndpoint(${i})" class="shrink-0 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 text-[11px] font-bold border border-indigo-500/20 transition-all">
+            Test →
+          </button>
+        </div>
+      `).join('');
+    }
+
+    async function testApiEndpoint(idx) {
+      const ep = API_ENDPOINTS[idx];
+      const output = document.getElementById('apiConsoleOutput');
+      const label = document.getElementById('consoleEndpointLabel');
+      const status = document.getElementById('consoleResponseStatus');
+
+      label.textContent = `${ep.method} ${ep.path}`;
+      status.textContent = 'Executing...';
+      output.textContent = `// Calling ${ep.method} ${ep.path}...\n// Awaiting response...`;
+
+      try {
+        const opts = { method: ep.method, headers: { 'Content-Type': 'application/json' } };
+        if (ep.body) opts.body = JSON.stringify(ep.body);
+        const res = await fetch(ep.path, opts);
+        const data = await res.json();
+        status.textContent = `HTTP ${res.status} ${res.ok ? '✓ OK' : '✗ Error'}`;
+        status.className = res.ok ? 'text-emerald-400 text-[11px] mono' : 'text-red-400 text-[11px] mono';
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch(e) {
+        status.textContent = 'Failed';
+        status.className = 'text-red-400 text-[11px] mono';
+        output.textContent = `// Error: ${e.message}`;
+      }
+    }
+
+    // ============================================================
+    // DATABASE
+    // ============================================================
+    async function loadDbHealth() {
+      try {
+        const health = await fetch('/api/health').then(r => r.json());
+        const db = health.database || {};
+        document.getElementById('db-count-patients').textContent = db.patientsCount ?? '—';
+        document.getElementById('db-count-screenings').textContent = db.screeningsCount ?? '—';
+        document.getElementById('db-count-visits').textContent = db.visitsCount ?? '—';
+        document.getElementById('db-count-camps').textContent = db.campsCount ?? '—';
+      } catch(e) {}
+    }
+
+    async function loadDbCollection(name) {
+      const output = document.getElementById('dbOutput');
+      const label = document.getElementById('dbCollectionLabel');
+      const count = document.getElementById('dbRecordCount');
+      label.textContent = `Collection: ${name}`;
+      output.textContent = '// Loading...';
+
+      const pathMap = {
+        patients: '/api/patients',
+        screenings: '/api/screenings',
+        visits: '/api/visits',
+        camps: '/api/camps',
+      };
+
+      try {
+        const data = await fetch(pathMap[name] || '/api/' + name).then(r => r.json());
+        const records = data[name] || data.patients || data.screenings || data.visits || data.camps || data;
+        const arr = Array.isArray(records) ? records : [records];
+        count.textContent = `${arr.length} record(s)`;
+        output.textContent = JSON.stringify(arr, null, 2);
+      } catch(e) {
+        output.textContent = `// Error: ${e.message}`;
+      }
+    }
+
+    // ============================================================
+    // SYNC
+    // ============================================================
+    async function triggerFullSync() {
+      const btn = document.getElementById('fullSyncBtn');
+      const out = document.getElementById('syncOutput');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="animate-spin material-symbols-outlined text-[15px]">autorenew</span> Syncing...';
+      out.classList.remove('hidden');
+      out.textContent = '// Initiating offline vault sync...\n// Pushing 3 patient records to ABHA ABDM cloud...\n// Awaiting server acknowledgment...';
+
+      try {
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ offlineRecords: [] })
+        });
+        const data = await res.json();
+        out.textContent = JSON.stringify(data, null, 2);
+        document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString('en-IN');
+        btn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check_circle</span> Synced!';
+        btn.className = btn.className.replace('bg-indigo-600', 'bg-emerald-600').replace('hover:bg-indigo-500', 'hover:bg-emerald-500');
+      } catch(e) {
+        out.textContent = `// Sync error: ${e.message}`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    refreshAll();
+    setInterval(refreshAll, 30000); // Auto-refresh every 30s
+  </script>
+</body>
+</html>
