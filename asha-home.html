@@ -182,9 +182,9 @@
 
       <!-- 2. Quick Action Tiles (Instantly Connected to Eye & Sugar Check / Queue / Registration) -->
       <div class="space-y-2.5">
-        <!-- Big Primary Action: New Screening (Links directly to Eye & Sugar Check or Modal) -->
+        <!-- Big Primary Action: New Screening (Links directly to Retina Scan & AI Triage) -->
         <div class="flex gap-2">
-          <a href="/eye-sugar-check" class="flex-1 bg-retisync-blue hover:bg-retisync-blue-hover text-white rounded-2xl p-4 shadow-sm flex items-center justify-between tap-active transition-transform" title="Launch Full Retinal & Glucose Checkup">
+          <a href="/retina-scan" class="flex-1 bg-retisync-blue hover:bg-retisync-blue-hover text-white rounded-2xl p-4 shadow-sm flex items-center justify-between tap-active transition-transform" title="Launch Retina Scan & AI Triage">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-[28px] text-white">document_scanner</span>
@@ -276,8 +276,8 @@
             </div>
           </div>
 
-          <!-- Connected: Launches Eye & Sugar Check with pre-loaded patient credentials -->
-          <a href="/eye-sugar-check?patient=Rabin+Das&age=54&glucose=168&risk=Stage2" class="w-full bg-retisync-blue hover:bg-retisync-blue-hover text-white rounded-xl h-11 flex items-center justify-center gap-2 text-[13.5px] font-bold tap-active transition-all cursor-pointer" title="Direct Screening Visit">
+          <!-- Connected: Launches Retina Scan & AI Triage with pre-loaded patient credentials -->
+          <a href="/retina-scan?patient=Rabin%20Das&glucose=168" class="w-full bg-retisync-blue hover:bg-retisync-blue-hover text-white rounded-xl h-11 flex items-center justify-center gap-2 text-[13.5px] font-bold tap-active transition-all cursor-pointer" title="Direct Screening Visit">
             <span class="material-symbols-outlined text-[19px]">directions_walk</span>
             <span>Visit &amp; Scan</span>
           </a>
@@ -431,7 +431,7 @@
           <span class="material-symbols-outlined text-[24px]">view_list</span>
           <span class="text-[11px] mt-0.5">Queue</span>
         </button>
-        <a href="/eye-sugar-check" class="flex flex-col items-center justify-center min-w-[56px] text-slate-500 hover:text-retisync-blue font-medium transition-colors" title="Open Retinal & Sugar Scanner">
+        <a href="/retina-scan" class="flex flex-col items-center justify-center min-w-[56px] text-slate-500 hover:text-retisync-blue font-medium transition-colors" title="Open Retina Scan &amp; AI Triage">
           <span class="material-symbols-outlined text-[24px]">qr_code_scanner</span>
           <span class="text-[11px] mt-0.5">Scan</span>
         </a>

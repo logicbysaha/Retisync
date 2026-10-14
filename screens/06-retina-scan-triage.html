@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Retina Scan &amp; AI Triage | RetiSync Drishti Care</title>
+  <meta name="description" content="AI-assisted retinal photo inspection and clinical diabetic retinopathy triage for ASHA community health workers."/>
+
+  <!-- Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "retisync-blue": "#0a58ca",
+            "retisync-blue-hover": "#0849a6",
+            "retisync-navy": "#0a192f",
+            "retisync-ice": "#e0edff",
+            "retisync-ice-bg": "#edf3fa",
+            "retisync-red": "#dc2626",
+          },
+          fontFamily: {
+            sans: ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+            serif: ["'DM Serif Display'", "Georgia", "serif"],
+            mono: ["'JetBrains Mono'", "monospace"],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #edf3fa;
+      font-family: 'Inter', sans-serif;
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    /* Animated Heatmap Biomarker Highlights */
+    .heatmap-halo {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .heatmap-halo-1 {
+      width: 72px;
+      height: 72px;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.75) 0%, rgba(234, 179, 8, 0.5) 45%, rgba(234, 179, 8, 0.0) 75%);
+      box-shadow: 0 0 25px rgba(249, 115, 22, 0.6);
+      animation: pulseHalo 2.4s infinite ease-in-out;
+    }
+
+    .heatmap-halo-2 {
+      width: 68px;
+      height: 68px;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.8) 0%, rgba(249, 115, 22, 0.45) 50%, rgba(249, 115, 22, 0.0) 75%);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+      animation: pulseHalo 2.4s infinite ease-in-out 0.8s;
+    }
+
+    @keyframes pulseHalo {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.95; }
+      50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.75; }
+    }
+
+    /* iOS-style toggle */
+    .toggle-checkbox:checked {
+      right: 0;
+      border-color: #0a58ca;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #0a58ca;
+    }
+
+    /* Hardware tap feedback */
+    .tap-btn:active {
+      transform: scale(0.98);
+      transition: transform 0.08s ease-out;
+    }
+
+    /* Toast animation */
+    .toast-anim {
+      animation: slideDown 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideDown {
+      from { transform: translate(-50%, -100%); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-[#edf3fa] text-slate-800 antialiased min-h-screen flex justify-center pb-8">
+
+  <!-- Floating Toast Notification -->
+  <div id="toastNotification" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-[92%] px-4 py-3 rounded-2xl bg-[#0a192f] text-white shadow-2xl border border-blue-400/30 items-center gap-3 toast-anim">
+    <div id="toastIcon" class="w-8 h-8 rounded-full bg-retisync-blue flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[18px]">check</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div id="toastTitle" class="text-[13px] font-bold leading-tight">Notification</div>
+      <div id="toastMessage" class="text-[11.5px] text-blue-200 leading-tight mt-0.5">Operation update</div>
+    </div>
+  </div>
+
+  <!-- PATIENT SWITCH MODAL -->
+  <div id="patientSwitchModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h3 class="font-bold text-[16px] text-slate-900">Select Active Patient</h3>
+        <button onclick="closeSwitchModal()" class="text-slate-400 hover:text-slate-600">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="space-y-2 max-h-72 overflow-y-auto" id="patientSelectList">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERRAL CONFIRMATION MODAL -->
+  <div id="referralModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 space-y-3.5">
+      <div class="flex items-center gap-3 pb-2 border-b border-slate-100">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 text-retisync-blue flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[24px]">local_hospital</span>
+        </div>
+        <div>
+          <h3 class="font-bold text-[16px] text-slate-900 leading-tight">PHC Specialist Referral</h3>
+          <p class="text-[11.5px] text-slate-500">Bishnupur Primary Health Centre</p>
+        </div>
+      </div>
+      <div class="text-[12.5px] text-slate-600 space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+        <div class="flex justify-between"><span class="text-slate-500">Patient:</span><strong class="text-slate-800" id="refPatientName">Rabin Das (54M)</strong></div>
+        <div class="flex justify-between"><span class="text-slate-500">Diagnosis:</span><strong class="text-red-600" id="refDiagnosis">Moderate NPDR</strong></div>
+        <div class="flex justify-between"><span class="text-slate-500">Specialist:</span><strong class="text-slate-800">Dr. S. Roy (Ophthalmology)</strong></div>
+        <div class="flex justify-between"><span class="text-slate-500">ABHA Queue:</span><span class="text-emerald-600 font-bold">Priority Triage • Fast-Track</span></div>
+      </div>
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeReferralModal()" class="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-semibold text-xs tap-btn">
+          Cancel
+        </button>
+        <button onclick="confirmReferral()" class="flex-1 py-2.5 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-xs tap-btn">
+          Confirm &amp; Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUNDED APPLICATION FRAME (Matches screenshot exactly, scales responsively on tablet/desktop) -->
+  <div class="w-full max-w-md md:max-w-lg bg-[#edf3fa] min-h-screen relative flex flex-col p-4 sm:p-5 gap-3.5 mx-auto">
+
+    <!-- Top Navigation Header -->
+    <header class="flex items-center justify-between pb-1">
+      <div class="flex items-center gap-3">
+        <!-- Back Arrow Button -->
+        <button onclick="handleBack()" class="w-10 h-10 rounded-full bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-slate-700 hover:bg-slate-50 tap-btn transition-colors" title="Back to ASHA Home">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="font-bold text-[17px] text-slate-900 tracking-tight leading-tight">Retina Scan &amp; AI Triage</h1>
+          <p class="text-[12px] text-slate-500 font-medium">ASHA Field Screening</p>
+        </div>
+      </div>
+      <!-- Online Badge -->
+      <div class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+        <span>Online</span>
+      </div>
+    </header>
+
+    <!-- 1. Active Patient Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 rounded-md bg-[#e0edff] text-retisync-blue text-[10.5px] font-bold tracking-wider uppercase">
+          ACTIVE PATIENT
+        </span>
+        <button onclick="openSwitchModal()" class="flex items-center gap-1 text-[12px] text-retisync-blue font-bold hover:underline tap-btn" title="Switch Patient">
+          <span class="material-symbols-outlined text-[15px]">swap_horiz</span>
+          <span>Switch</span>
+        </button>
+      </div>
+
+      <div>
+        <h2 id="patientName" class="font-bold text-[20px] text-slate-900 tracking-tight leading-tight">Rabin Das <span class="font-normal text-slate-500 text-[16px]">(54M)</span></h2>
+        <p class="text-[12px] text-slate-500 mt-0.5">Patient ID: <strong id="patientId" class="text-slate-800 font-mono">PT-1001</strong></p>
+      </div>
+
+      <!-- Two Metric Boxes (Fasting Sugar + Post-Meal Sugar) -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="bg-[#f1f6fc] rounded-xl p-3 border border-slate-200/60">
+          <span class="text-[11px] text-slate-500 font-medium block">Fasting Sugar</span>
+          <div class="mt-0.5 flex items-baseline gap-1">
+            <span id="fastingSugar" class="font-bold text-[22px] text-slate-900 leading-none">168</span>
+            <span class="text-[11px] text-slate-500 font-medium">mg/dL</span>
+          </div>
+        </div>
+        <div class="bg-[#f1f6fc] rounded-xl p-3 border border-slate-200/60">
+          <span class="text-[11px] text-slate-500 font-medium block">Post-Meal Sugar</span>
+          <div class="mt-0.5 flex items-baseline gap-1">
+            <span id="postMealSugar" class="font-bold text-[22px] text-retisync-red leading-none">245</span>
+            <span class="text-[11px] text-slate-500 font-medium">mg/dL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Image Capture Selection -->
+    <div class="space-y-2">
+      <div class="flex items-center justify-between px-0.5">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">IMAGE CAPTURE</span>
+        <span class="px-2 py-0.5 rounded-md bg-[#e0edff] text-retisync-blue text-[10.5px] font-semibold">
+          High Resolution
+        </span>
+      </div>
+
+      <!-- Two Cards: Smartphone Lens vs Upload Eye Photo -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <!-- Lens (Active selected state) -->
+        <button id="btnCaptureLens" onclick="selectCaptureSource('lens')" type="button" class="bg-white border-2 border-retisync-blue rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn transition-all">
+          <div class="w-11 h-11 rounded-full bg-[#e0edff] text-retisync-blue flex items-center justify-center mb-1">
+            <span class="material-symbols-outlined text-[24px]">camera_alt</span>
+          </div>
+          <span class="font-bold text-[13px] text-slate-900 leading-tight">Smartphone Lens</span>
+          <span class="text-[11px] font-semibold text-retisync-blue">Adapter (20D)</span>
+        </button>
+
+        <!-- Upload Eye Photo -->
+        <button id="btnCaptureUpload" onclick="triggerPhotoUpload()" type="button" class="bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn hover:border-slate-300 transition-all">
+          <div class="w-11 h-11 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+            <span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+          </div>
+          <span class="font-bold text-[13px] text-slate-900 leading-tight">Upload Eye Photo</span>
+          <span class="text-[11px] text-slate-500">DICOM / JPG File</span>
+        </button>
+      </div>
+
+      <!-- Hidden file input for direct photo upload -->
+      <input id="retinaFileInput" type="file" accept="image/*" class="hidden" onchange="handleFileSelected(event)"/>
+    </div>
+
+    <!-- 3. Retinal Photo Inspection Card -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-[15px] text-slate-900 leading-tight">Retinal Photo Inspection</h3>
+          <p class="text-[11.5px] text-slate-500 mt-0.5">Right Eye (OD) • Focus Good</p>
+        </div>
+        <span class="px-2.5 py-0.5 rounded-full border border-blue-300 bg-blue-50 text-retisync-blue text-[11px] font-semibold">
+          AI Assessed
+        </span>
+      </div>
+
+      <!-- Fundus Photography Display with Heatmap Overlay -->
+      <div class="relative w-full aspect-square bg-black rounded-xl overflow-hidden flex items-center justify-center border border-slate-900 shadow-inner">
+        <!-- Retinal Image -->
+        <img id="retinaDisplayImg" src="retina_fundus.jpg" alt="Clinical Retinal Fundus" class="w-full h-full object-cover"/>
+
+        <!-- Heatmap Biomarkers (Toggleable) -->
+        <div id="heatmapContainer" class="absolute inset-0 pointer-events-none">
+          <!-- Halo 1 (Upper lesion highlight) -->
+          <div class="heatmap-halo heatmap-halo-1" style="top: 48%; left: 56.5%;"></div>
+          <div class="absolute w-2 h-2 rounded-full bg-white shadow-md pointer-events-none" style="top: 48%; left: 56.5%; transform: translate(-50%, -50%);"></div>
+
+          <!-- Halo 2 (Lower lesion highlight) -->
+          <div class="heatmap-halo heatmap-halo-2" style="top: 55%; left: 58.5%;"></div>
+          <div class="absolute w-2 h-2 rounded-full bg-white shadow-md pointer-events-none" style="top: 55%; left: 58.5%; transform: translate(-50%, -50%);"></div>
+        </div>
+
+        <!-- Scan Quality watermark badge -->
+        <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-xs text-white/90 text-[10px] mono px-2 py-0.5 rounded">
+          OD · 50° FOV · 4K
+        </div>
+      </div>
+
+      <!-- AI Heatmap (Explainable AI) Toggle Switch -->
+      <div class="bg-[#edf5fe] border border-blue-200/70 rounded-xl p-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-[20px] text-retisync-blue">visibility</span>
+          <div>
+            <div class="font-bold text-[13px] text-slate-900 leading-tight">AI Heatmap (Explainable AI)</div>
+            <div class="text-[11px] text-slate-500">Visual biomarker highlights</div>
+          </div>
+        </div>
+
+        <!-- Switch Toggle -->
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input id="heatmapToggle" type="checkbox" checked onchange="toggleHeatmap(this.checked)" class="sr-only peer">
+          <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-retisync-blue"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- 4. Triage Diagnosis Card -->
+    <div class="bg-white rounded-2xl border border-blue-200/90 p-4 shadow-xs space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-retisync-red">
+          TRIAGE DIAGNOSIS
+        </span>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-[11px] text-slate-500 font-medium">Confidence</span>
+          <span id="aiConfidence" class="font-bold text-[20px] text-retisync-blue leading-none">94%</span>
+        </div>
+      </div>
+
+      <div>
+        <h3 id="triageStageText" class="font-bold text-[18px] text-slate-900 leading-tight">Moderate Diabetic Retinopathy</h3>
+      </div>
+
+      <!-- WHAT THE AI SAW Quote Box -->
+      <div class="bg-[#f8fafc] border border-slate-200/70 rounded-xl p-3 space-y-1">
+        <span class="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 block">
+          WHAT THE AI SAW
+        </span>
+        <p id="aiObservationText" class="text-[12.5px] text-slate-700 leading-relaxed font-normal">
+          Early micro-bleeding and swollen capillaries detected near the macula. Caused by high sugar spikes.
+        </p>
+      </div>
+    </div>
+
+    <!-- 5. Bottom Action Buttons -->
+    <div class="space-y-2.5 pt-1">
+      <!-- Refer Button -->
+      <button id="referSpecialistBtn" onclick="openReferralModal()" type="button" class="w-full h-12 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[14px] flex items-center justify-center gap-2 shadow-xs tap-btn transition-all">
+        <span class="material-symbols-outlined text-[19px]">add_box</span>
+        <span>Refer to PHC Eye Specialist</span>
+      </button>
+
+      <!-- Save & Mark Done Button -->
+      <button id="saveDoneBtn" onclick="saveAndMarkDone()" type="button" class="w-full h-12 rounded-xl bg-white border-2 border-retisync-blue text-retisync-blue font-bold text-[14px] flex items-center justify-center gap-2 tap-btn hover:bg-blue-50/50 transition-all">
+        <span class="material-symbols-outlined text-[19px]">check_circle</span>
+        <span>Save &amp; Mark Done</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // STATE & PATIENT DATA
+    // ============================================================
+    const PATIENT_DATABASE = [
+      {
+        id: "pat-002",
+        displayId: "PT-1001",
+        name: "Rabin Das",
+        age: 54,
+        gender: "M",
+        fastingSugar: 168,
+        postMealSugar: 245,
+        confidence: 94,
+        stage: "Moderate Diabetic Retinopathy",
+        stageCode: 2,
+        whatAiSaw: "Early micro-bleeding and swollen capillaries detected near the macula. Caused by high sugar spikes.",
+        riskScore: 78,
+      },
+      {
+        id: "pat-003",
+        displayId: "PT-1002",
+        name: "Parvati Soren",
+        age: 58,
+        gender: "F",
+        fastingSugar: 145,
+        postMealSugar: 178,
+        confidence: 91,
+        stage: "Mild NPDR with Isolated Microaneurysms",
+        stageCode: 1,
+        whatAiSaw: "Isolated microaneurysms noted in posterior pole. Macula is currently preserved without edema.",
+        riskScore: 65,
+      },
+      {
+        id: "pat-001",
+        displayId: "PT-1003",
+        name: "Rajesh Sharma",
+        age: 54,
+        gender: "M",
+        fastingSugar: 158,
+        postMealSugar: 245,
+        confidence: 96,
+        stage: "Severe Diabetic Retinopathy",
+        stageCode: 3,
+        whatAiSaw: "Extensive retinal hemorrhages in 4 quadrants and venous beading. Urgent specialist review needed.",
+        riskScore: 83,
+      },
+      {
+        id: "pat-004",
+        displayId: "PT-1004",
+        name: "Meera Mondal",
+        age: 49,
+        gender: "F",
+        fastingSugar: 98,
+        postMealSugar: 132,
+        confidence: 98,
+        stage: "No Diabetic Retinopathy (Normal)",
+        stageCode: 0,
+        whatAiSaw: "Clear posterior pole. Optic disc pink with sharp margins. Retinal vasculature healthy.",
+        riskScore: 12,
+      }
+    ];
+
+    let currentPatient = PATIENT_DATABASE[0];
+
+    // ============================================================
+    // INITIALIZATION & URL PARAMETER PARSING
+    // ============================================================
+    function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramName = urlParams.get('patient');
+      const paramGlucose = urlParams.get('glucose');
+
+      if (paramName) {
+        const matched = PATIENT_DATABASE.find(p => p.name.toLowerCase().includes(paramName.toLowerCase()));
+        if (matched) currentPatient = matched;
+      }
+      if (paramGlucose) {
+        currentPatient.postMealSugar = parseInt(paramGlucose) || currentPatient.postMealSugar;
+      }
+
+      applyPatientData(currentPatient);
+      renderPatientSelectList();
+    }
+
+    function applyPatientData(p) {
+      document.getElementById('patientName').innerHTML = `${p.name} <span class="font-normal text-slate-500 text-[16px]">(${p.age}${p.gender})</span>`;
+      document.getElementById('patientId').textContent = p.displayId;
+      document.getElementById('fastingSugar').textContent = p.fastingSugar;
+      document.getElementById('postMealSugar').textContent = p.postMealSugar;
+      document.getElementById('aiConfidence').textContent = `${p.confidence}%`;
+      document.getElementById('triageStageText').textContent = p.stage;
+      document.getElementById('aiObservationText').textContent = p.whatAiSaw;
+      document.getElementById('refPatientName').textContent = `${p.name} (${p.age}${p.gender})`;
+      document.getElementById('refDiagnosis').textContent = p.stage;
+    }
+
+    // ============================================================
+    // HEATMAP TOGGLE
+    // ============================================================
+    function toggleHeatmap(show) {
+      const container = document.getElementById('heatmapContainer');
+      if (show) {
+        container.style.display = 'block';
+        showToast('Heatmap Active', 'Biomarker overlay enabled (Explainable AI)');
+      } else {
+        container.style.display = 'none';
+        showToast('Heatmap Hidden', 'Viewing unfiltered raw fundus photograph');
+      }
+    }
+
+    // ============================================================
+    // CAPTURE SOURCE SWITCHING
+    // ============================================================
+    function selectCaptureSource(source) {
+      const btnLens = document.getElementById('btnCaptureLens');
+      const btnUpload = document.getElementById('btnCaptureUpload');
+
+      if (source === 'lens') {
+        btnLens.className = 'bg-white border-2 border-retisync-blue rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn transition-all';
+        btnUpload.className = 'bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn hover:border-slate-300 transition-all';
+        showToast('Smartphone Lens', '20D Ophthalmoscopy adapter calibrated');
+      }
+    }
+
+    function triggerPhotoUpload() {
+      document.getElementById('retinaFileInput').click();
+    }
+
+    function handleFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        document.getElementById('retinaDisplayImg').src = evt.target.result;
+        showToast('Photo Loaded', `${file.name} loaded and analyzed by AI`);
+
+        // Update button visual states
+        const btnLens = document.getElementById('btnCaptureLens');
+        const btnUpload = document.getElementById('btnCaptureUpload');
+        btnUpload.className = 'bg-white border-2 border-retisync-blue rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn transition-all';
+        btnLens.className = 'bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 shadow-xs tap-btn hover:border-slate-300 transition-all';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ============================================================
+    // SWITCH PATIENT MODAL
+    // ============================================================
+    function openSwitchModal() {
+      document.getElementById('patientSwitchModal').classList.remove('hidden');
+      document.getElementById('patientSwitchModal').classList.add('flex');
+    }
+
+    function closeSwitchModal() {
+      document.getElementById('patientSwitchModal').classList.add('hidden');
+      document.getElementById('patientSwitchModal').classList.remove('flex');
+    }
+
+    function renderPatientSelectList() {
+      const container = document.getElementById('patientSelectList');
+      container.innerHTML = PATIENT_DATABASE.map(p => `
+        <div onclick="selectPatient('${p.id}')" class="p-3 rounded-xl border ${p.id === currentPatient.id ? 'border-retisync-blue bg-blue-50/60' : 'border-slate-200 bg-white hover:bg-slate-50'} flex items-center justify-between cursor-pointer transition-colors">
+          <div>
+            <div class="font-bold text-[13px] text-slate-900">${p.name} <span class="text-slate-500 font-normal">(${p.age}${p.gender})</span></div>
+            <div class="text-[11px] text-slate-500">Sugar: ${p.postMealSugar} mg/dL · ${p.displayId}</div>
+          </div>
+          <span class="text-[11px] font-bold ${p.stageCode >= 2 ? 'text-red-600' : p.stageCode === 1 ? 'text-amber-600' : 'text-emerald-600'}">
+            ${p.stage.split(' ')[0]}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    function selectPatient(id) {
+      const p = PATIENT_DATABASE.find(item => item.id === id);
+      if (p) {
+        currentPatient = p;
+        applyPatientData(currentPatient);
+        renderPatientSelectList();
+        closeSwitchModal();
+        showToast('Patient Switched', `Active: ${p.name}`);
+      }
+    }
+
+    // ============================================================
+    // REFERRAL MODAL & WORKFLOW
+    // ============================================================
+    function openReferralModal() {
+      document.getElementById('referralModal').classList.remove('hidden');
+      document.getElementById('referralModal').classList.add('flex');
+    }
+
+    function closeReferralModal() {
+      document.getElementById('referralModal').classList.add('hidden');
+      document.getElementById('referralModal').classList.remove('flex');
+    }
+
+    async function confirmReferral() {
+      closeReferralModal();
+      showToast('Referral Created', `Dr. S. Roy notified at Bishnupur PHC`);
+
+      // Record to server
+      try {
+        await fetch('/api/screenings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patientId: currentPatient.id,
+            patientName: currentPatient.name,
+            eyeScanned: 'Right Eye (OD)',
+            glucoseReading: currentPatient.postMealSugar,
+            drStage: currentPatient.stage,
+            drStageCode: currentPatient.stageCode,
+            confidence: currentPatient.confidence,
+            retinopathyRiskScore: currentPatient.riskScore,
+            clinicalRecommendation: `Referral expedited to Dr. S. Roy for ${currentPatient.stage}.`,
+            urgency: 'Immediate'
+          })
+        });
+      } catch(e) {}
+    }
+
+    // ============================================================
+    // SAVE & MARK DONE
+    // ============================================================
+    async function saveAndMarkDone() {
+      const btn = document.getElementById('saveDoneBtn');
+      btn.innerHTML = '<span class="material-symbols-outlined text-[19px] animate-spin">autorenew</span> Saving...';
+      btn.disabled = true;
+
+      try {
+        // Send screening result to backend
+        await fetch('/api/screenings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patientId: currentPatient.id,
+            patientName: currentPatient.name,
+            eyeScanned: 'Right Eye (OD)',
+            glucoseReading: currentPatient.postMealSugar,
+            bloodPressure: '130/85 mmHg',
+            drStage: currentPatient.stage,
+            drStageCode: currentPatient.stageCode,
+            confidence: currentPatient.confidence,
+            retinopathyRiskScore: currentPatient.riskScore,
+            clinicalRecommendation: currentPatient.whatAiSaw,
+            urgency: currentPatient.stageCode >= 2 ? 'Priority' : 'Routine'
+          })
+        });
+
+        showToast('Screening Saved', 'Synced to ABHA Central Health Vault');
+        setTimeout(() => {
+          window.location.href = '/asha-home';
+        }, 800);
+      } catch (err) {
+        showToast('Saved Offline', 'Stored in offline queue; will sync when online');
+        setTimeout(() => {
+          window.location.href = '/asha-home';
+        }, 900);
+      }
+    }
+
+    function handleBack() {
+      if (document.referrer && document.referrer.includes(window.location.host)) {
+        window.history.back();
+      } else {
+        window.location.href = '/asha-home';
+      }
+    }
+
+    // ============================================================
+    // TOAST HELPER
+    // ============================================================
+    function showToast(title, msg) {
+      const t = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('flex');
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        t.classList.add('hidden');
+        t.classList.remove('flex');
+      }, 2600);
+    }
+
+    // Run on mount
+    init();
+  </script>
+</body>
+</html>

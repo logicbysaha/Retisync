@@ -217,6 +217,9 @@
         <a href="/asha-home" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-slate-400">
           <span class="material-symbols-outlined text-[16px]">health_and_safety</span> ASHA Home
         </a>
+        <a href="/retina-scan" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-slate-400">
+          <span class="material-symbols-outlined text-[16px]">center_focus_strong</span> Retina Scan &amp; Triage
+        </a>
         <a href="/api-docs" target="_blank" class="nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] text-indigo-400">
           <span class="material-symbols-outlined text-[16px]">open_in_new</span> REST API Console
         </a>
@@ -537,14 +540,67 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Input Panel -->
             <div class="glass-card p-5 space-y-4">
-              <div class="font-bold text-white text-[14px]">Input Configuration</div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Image Source (URL or path)</label>
-                <input id="wfImageInput" type="text" value="https://www.vrmny.com/wp-content/uploads/2021/12/npdr-vs-pdr.jpg" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm mono outline-none focus:border-indigo-500/50 focus:bg-white/8 transition-all"/>
+              <div class="flex items-center justify-between">
+                <div class="font-bold text-white text-[14px]">Input Configuration</div>
+                <span class="text-[10.5px] mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">High Resolution</span>
               </div>
+
+              <!-- IMAGE CAPTURE SELECTION (Smartphone Lens vs Upload Eye Photo) -->
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Image Capture Mode</label>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <!-- Smartphone Lens -->
+                  <button id="wfBtnLens" onclick="setWfCaptureMode('lens')" type="button" class="p-3 rounded-xl border-2 border-indigo-500 bg-indigo-500/15 text-white flex flex-col items-center justify-center text-center gap-1 transition-all">
+                    <div class="w-9 h-9 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center mb-0.5">
+                      <span class="material-symbols-outlined text-[20px]">camera_alt</span>
+                    </div>
+                    <span class="font-bold text-[12.5px] leading-tight">Smartphone Lens</span>
+                    <span class="text-[10.5px] text-indigo-300 font-semibold">Adapter (20D)</span>
+                  </button>
+
+                  <!-- Upload Eye Photo -->
+                  <button id="wfBtnUpload" onclick="triggerWfUpload()" type="button" class="p-3 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 text-slate-300 flex flex-col items-center justify-center text-center gap-1 transition-all">
+                    <div class="w-9 h-9 rounded-full bg-white/10 text-slate-400 flex items-center justify-center mb-0.5">
+                      <span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+                    </div>
+                    <span class="font-bold text-[12.5px] leading-tight text-white">Upload Eye Photo</span>
+                    <span class="text-[10.5px] text-slate-400">DICOM / JPG File</span>
+                  </button>
+                </div>
+                <!-- Hidden file input for photo upload -->
+                <input id="wfFileInput" type="file" accept="image/*" class="hidden" onchange="handleWfFileSelected(event)"/>
+              </div>
+
+              <!-- Image Source URL or File Path with Quick Presets -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Image Source</label>
+                  <div class="flex items-center gap-1.5 text-[10.5px]">
+                    <button onclick="setWfPreset('retina')" type="button" class="text-indigo-400 hover:text-indigo-300 hover:underline">Retina Fundus</button>
+                    <span class="text-slate-600">·</span>
+                    <button onclick="setWfPreset('sandhya')" type="button" class="text-indigo-400 hover:text-indigo-300 hover:underline">ASHA Photo</button>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <input id="wfImageInput" type="text" value="retina_fundus.jpg" oninput="updateWfPreview(this.value)" class="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm mono outline-none focus:border-indigo-500/50 focus:bg-white/8 transition-all"/>
+                  <button onclick="triggerWfUpload()" class="px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/25 text-xs font-semibold flex items-center gap-1 shrink-0" title="Upload Local Eye Photo">
+                    <span class="material-symbols-outlined text-[16px]">upload_file</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Photo Inspection Preview Box -->
+              <div class="relative w-full h-36 rounded-xl bg-black/60 border border-white/10 overflow-hidden flex items-center justify-center">
+                <img id="wfPreviewImg" src="retina_fundus.jpg" alt="Selected Eye Inspection Photo" class="w-full h-full object-contain"/>
+                <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] mono text-emerald-300 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                  <span id="wfPreviewLabel">retina_fundus.jpg · Focus Good</span>
+                </div>
+              </div>
+
               <div>
                 <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">VLM Prompt</label>
-                <input id="wfPromptInput" type="text" value="Describe the scene in detail" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm outline-none focus:border-indigo-500/50 transition-all"/>
+                <input id="wfPromptInput" type="text" value="Describe the scene in detail" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-sm outline-none focus:border-indigo-500/50 transition-all"/>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>

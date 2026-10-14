@@ -45,6 +45,11 @@ app.get('/dev-dashboard', (req, res) => {
   res.sendFile(path.join(ROOT_DIR, 'dev-dashboard.html'));
 });
 
+// Retina Scan & AI Triage Portal (Clinical Fundus Inspection)
+app.get('/retina-scan', (req, res) => {
+  res.sendFile(path.join(ROOT_DIR, 'retina-scan.html'));
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
