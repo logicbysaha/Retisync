@@ -128,13 +128,20 @@ def handle_tools_call(request_id: Any, params: dict):
     logger.info(f"Invoking tool: {tool_name} with args: {args}")
 
     try:
+        import importlib
+        import workflow
+        import retinal_workflow
+        importlib.reload(workflow)
+        importlib.reload(retinal_workflow)
+        active_runner = workflow.UltralyticsAgentWorkflow()
+        active_retinal_runner = retinal_workflow.RetisyncRetinalWorkflow()
         if tool_name == "run_ultralytics_workflow":
             image_path = args.get("image_path")
             prompt = args.get("prompt", "Describe the scene")
             min_person = int(args.get("min_person_count", 1))
             conf = float(args.get("confidence_threshold", 0.25))
 
-            result = ultralytics_runner.run(
+            result = active_runner.run(
                 image_source=image_path,
                 prompt=prompt,
                 min_person_count=min_person,
@@ -149,7 +156,7 @@ def handle_tools_call(request_id: Any, params: dict):
             if fasting_sugar is not None:
                 fasting_sugar = int(fasting_sugar)
 
-            result = retinal_runner.run(
+            result = active_retinal_runner.run(
                 image_path=image_path,
                 patient_name=patient_name,
                 fasting_sugar=fasting_sugar
