@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Patient Profile | Retisync Drishti Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "retisync-blue": "#0a58ca",
+            "retisync-blue-hover": "#0849a6",
+            "retisync-navy": "#061e47",
+            "retisync-ice": "#dbe9fe",
+            "retisync-ice-light": "#edf4fe",
+            "retisync-pill": "#cfe2ff",
+            "retisync-alert-red": "#c92a2a",
+            "retisync-pink": "#ffe8e8",
+            "retisync-peach": "#ffe3e3"
+          },
+          fontFamily: {
+            "sans": ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+            "serif": ["'DM Serif Display'", "Georgia", "serif"],
+            "bengali": ["'Noto Sans Bengali'", "'Inter'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body { width:100%; margin:0; padding:0; min-height:100%; background:#0b1329; }
+    body { overscroll-behavior-y:none; }
+    ::-webkit-scrollbar { display:none; }
+    .pb-safe { padding-bottom: max(env(safe-area-inset-bottom,0px),1rem); }
+    .pt-safe { padding-top: max(env(safe-area-inset-top,0px),0.75rem); }
+
+    .toast-anim { animation: slideDown 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+    @keyframes slideDown {
+      from { transform:translate(-50%,-100%); opacity:0; }
+      to { transform:translate(-50%,0); opacity:1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity:0; transform:translateY(12px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .animate-card { animation: fadeInUp 0.35s ease-out both; }
+    .animate-card-d1 { animation-delay: 0.05s; }
+    .animate-card-d2 { animation-delay: 0.1s; }
+    .animate-card-d3 { animation-delay: 0.15s; }
+    .animate-card-d4 { animation-delay: 0.2s; }
+    .animate-card-d5 { animation-delay: 0.25s; }
+    .animate-card-d6 { animation-delay: 0.3s; }
+
+    /* Toggle switch */
+    .toggle-track {
+      width: 44px; height: 24px; border-radius: 999px;
+      background: #cbd5e1; position: relative; cursor: pointer;
+      transition: background 0.25s;
+    }
+    .toggle-track.active { background: #0a58ca; }
+    .toggle-thumb {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; position: absolute; top: 2px; left: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: left 0.25s;
+    }
+    .toggle-track.active .toggle-thumb { left: 22px; }
+
+    /* QR Modal */
+    .qr-overlay {
+      position: fixed; inset: 0; z-index: 90;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .qr-overlay.show { display: flex; }
+  </style>
+</head>
+<body class="bg-[#0b1329] text-slate-900 font-sans antialiased flex justify-center min-h-screen">
+
+  <!-- Toast -->
+  <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-[90%] px-4 py-3 rounded-2xl bg-[#061e47] text-white shadow-2xl border border-blue-400/30 items-center gap-3 toast-anim">
+    <div class="w-8 h-8 rounded-full bg-retisync-blue flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[18px]">check</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div id="toastTitle" class="text-[13px] font-bold leading-tight">Copied</div>
+      <div id="toastMessage" class="text-[11.5px] text-blue-200 leading-tight mt-0.5">ABHA ID copied</div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="qr-overlay" onclick="closeQR(event)">
+    <div class="bg-white rounded-3xl p-6 w-[85%] max-w-[320px] text-center shadow-2xl" onclick="event.stopPropagation()">
+      <h3 class="font-serif font-bold text-[18px] text-slate-900 mb-1">ABHA Health Card</h3>
+      <p class="text-[12px] text-slate-500 mb-4">Scan at any clinic or hospital</p>
+      <!-- QR placeholder using SVG -->
+      <div class="mx-auto w-48 h-48 bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl flex items-center justify-center mb-4">
+        <div class="text-center">
+          <span class="material-symbols-outlined text-[48px] text-retisync-blue">qr_code_2</span>
+          <div class="text-[11px] text-slate-500 font-semibold mt-1">91-4820-1928-4401</div>
+        </div>
+      </div>
+      <div class="text-[13px] font-bold text-slate-900 mb-0.5">Rajesh Sharma</div>
+      <div class="text-[11px] text-slate-500 mb-4">ABHA ID: 91-4820-1928-4401</div>
+      <button onclick="closeQR()" class="w-full h-11 rounded-xl bg-retisync-blue text-white font-bold text-[14px] active:scale-[0.97] transition-all cursor-pointer">Close</button>
+    </div>
+  </div>
+
+  <!-- GROUNDED MOBILE FRAME -->
+  <div class="w-full max-w-md bg-[#f6f9fc] min-h-screen shadow-2xl border-x border-slate-300/40 relative flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 inset-x-0 z-40 bg-white border-b border-slate-200/90 shadow-2xs pt-safe">
+      <div class="h-14 px-4 flex items-center justify-between">
+        <div class="flex items-center gap-3 min-w-0">
+          <a href="patient-home.html" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-[20px] text-slate-700">arrow_back</span>
+          </a>
+          <h1 class="font-serif font-bold text-[19px] text-slate-900 tracking-tight leading-tight">Patient Profile</h1>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-retisync-blue text-white flex items-center justify-center font-serif font-bold text-[13px] shrink-0">
+          <span id="headerInitials">RS</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 flex flex-col gap-4 p-4 pb-8">
+
+      <!-- 1. Audio Listen Banner -->
+      <div class="bg-retisync-ice-light border border-blue-200/60 rounded-2xl p-4 flex items-center justify-between animate-card">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[22px]">record_voice_over</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-bold text-[14px] text-slate-900 leading-tight">Listen to Profile Details</div>
+            <div class="text-[11.5px] text-slate-500 mt-0.5">Tap to hear your medical record aloud</div>
+          </div>
+        </div>
+        <button id="listenBtn" type="button" class="px-4 py-2 rounded-xl bg-retisync-blue text-white font-bold text-[13px] flex items-center gap-1.5 shrink-0 active:scale-95 transition-all cursor-pointer hover:bg-retisync-blue-hover shadow-xs">
+          <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+          <span id="listenLabel">Listen</span>
+        </button>
+      </div>
+
+      <!-- 2. Patient Identity Card -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs animate-card animate-card-d1">
+        <!-- Avatar & Name -->
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-16 h-16 rounded-full bg-retisync-blue text-white flex items-center justify-center font-serif font-bold text-[20px] shadow-md shrink-0">
+            <span id="profileInitials">RS</span>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 id="profileName" class="font-serif font-bold text-[20px] text-slate-900 leading-tight">Rajesh Sharma</h2>
+              <span class="px-2 py-0.5 rounded-full bg-blue-100 text-retisync-blue text-[10px] font-bold border border-blue-200/80 inline-flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[11px]">verified</span> Verified
+              </span>
+            </div>
+            <div class="text-[13px] text-slate-500 mt-0.5">54 Years • Male</div>
+            <div class="flex items-center gap-1 mt-1 text-[12px] text-slate-500">
+              <span class="material-symbols-outlined text-[14px]">location_on</span>
+              <span>Bishnupur Village, Ward 4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABHA Section -->
+        <div class="bg-slate-50 border border-slate-200/70 rounded-xl p-3.5">
+          <div class="text-[9.5px] font-bold text-slate-400 uppercase tracking-[0.1em] mb-1">Ayushman Bharat Health Account</div>
+          <div class="text-[10.5px] font-semibold text-slate-500 mb-0.5">ABHA ID</div>
+          <div id="abhaId" class="font-serif font-bold text-[18px] text-slate-900 tracking-wide">91-4820-1928-4401</div>
+          <div class="flex items-center gap-2 mt-3">
+            <button id="copyAbhaBtn" type="button" class="flex-1 h-9 rounded-lg bg-retisync-ice border border-blue-200/80 text-retisync-blue font-bold text-[12px] flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer hover:bg-retisync-pill">
+              <span class="material-symbols-outlined text-[15px]">content_copy</span> Copy
+            </button>
+            <button id="showQrBtn" type="button" class="flex-1 h-9 rounded-lg bg-retisync-blue text-white font-bold text-[12px] flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer hover:bg-retisync-blue-hover shadow-xs">
+              <span class="material-symbols-outlined text-[15px]">qr_code_2</span> Show QR
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Health Summary Card -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs animate-card animate-card-d2">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-serif font-bold text-[18px] text-slate-900 leading-tight">Health Summary</h3>
+          <span class="text-[11px] text-slate-400 font-medium">Updated 3 days ago</span>
+        </div>
+
+        <!-- Eye Risk Alert -->
+        <div class="bg-retisync-peach border border-red-200/70 rounded-xl p-3.5 flex items-start gap-3 mb-3">
+          <div class="w-10 h-10 rounded-full bg-red-100 text-retisync-alert-red flex items-center justify-center shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[22px]">warning</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-bold text-[14px] text-retisync-alert-red leading-tight">Eye Risk: 78% Vulnerability</div>
+            <div class="text-[12px] text-slate-600 mt-0.5 leading-relaxed">Urgent eye examination recommended to protect your eyesight.</div>
+          </div>
+        </div>
+
+        <!-- Type 2 Diabetes -->
+        <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-3.5 flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[22px]">water_drop</span>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-[14px] text-slate-900 leading-tight">Type 2 Diabetes</div>
+              <div class="text-[11.5px] text-slate-500 mt-0.5">Diagnosed 8 Years ago</div>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-blue-50 text-retisync-blue text-[10.5px] font-bold border border-blue-200/70 shrink-0">Monitored</span>
+        </div>
+
+        <!-- Blood Pressure -->
+        <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-3.5 flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[22px]">vital_signs</span>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-[14px] text-slate-900 leading-tight">Blood Pressure (Hypertension)</div>
+              <div class="text-[11.5px] text-slate-500 mt-0.5">Co-Morbidity Status: Yes</div>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[10.5px] font-bold border border-amber-200/70 shrink-0">Active</span>
+        </div>
+
+        <!-- Latest Blood Sugar -->
+        <div class="border border-slate-200/70 rounded-xl overflow-hidden">
+          <div class="bg-slate-100 px-3.5 py-2 flex items-center justify-between border-b border-slate-200/70">
+            <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Latest Blood Sugar</span>
+            <span class="text-[10.5px] text-slate-400 font-medium">BPHC Lab Record</span>
+          </div>
+          <div class="grid grid-cols-2 divide-x divide-slate-200/70">
+            <div class="p-3.5 text-center">
+              <div class="text-[11px] text-slate-500 font-semibold mb-1">Fasting</div>
+              <div class="font-serif font-bold text-[22px] text-retisync-alert-red leading-none">168</div>
+              <div class="text-[10.5px] text-slate-500 font-semibold mt-0.5">mg/dL</div>
+            </div>
+            <div class="p-3.5 text-center">
+              <div class="text-[11px] text-slate-500 font-semibold mb-1">Post-Meal</div>
+              <div class="font-serif font-bold text-[22px] text-retisync-alert-red leading-none">245</div>
+              <div class="text-[10.5px] text-slate-500 font-semibold mt-0.5">mg/dL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Your Village ASHA Worker -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs animate-card animate-card-d3">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-serif font-bold text-[18px] text-slate-900 leading-tight">Your Village ASHA Worker</h3>
+          <button class="w-8 h-8 rounded-full bg-red-50 text-red-400 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer active:scale-90">
+            <span class="material-symbols-outlined text-[20px]">favorite</span>
+          </button>
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <img src="sandhya_avatar.jpg" alt="Sandhya Didi" class="w-12 h-12 rounded-full object-cover border-2 border-retisync-ice shadow-xs" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="w-12 h-12 rounded-full bg-retisync-blue text-white items-center justify-center font-serif font-bold text-[14px] hidden shrink-0">SD</div>
+          <div class="min-w-0">
+            <div class="font-bold text-[15px] text-slate-900 leading-tight">Sandhya Didi</div>
+            <div class="text-[12px] text-slate-500 mt-0.5">Your Village ASHA Worker</div>
+            <div class="text-[11.5px] text-slate-400">Bishnupur Sub-Center</div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <a href="tel:+919876543210" class="w-full h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[13.5px] flex items-center justify-center gap-2 active:scale-[0.97] transition-all shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">call</span>
+            <span>Call Sandhya Didi</span>
+          </a>
+          <button id="requestVisitBtn" type="button" class="w-full h-11 rounded-xl bg-white border-2 border-retisync-blue text-retisync-blue font-bold text-[13.5px] flex items-center justify-center gap-2 active:scale-[0.97] transition-all cursor-pointer hover:bg-retisync-ice-light">
+            <span class="material-symbols-outlined text-[18px]">home_health</span>
+            <span>Request Home Visit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Clinic & Doctor Details -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs animate-card animate-card-d4">
+        <h3 class="font-serif font-bold text-[18px] text-slate-900 leading-tight mb-4">Clinic &amp; Doctor Details</h3>
+
+        <!-- Primary Health Center -->
+        <div class="flex items-start gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[22px]">local_hospital</span>
+          </div>
+          <div class="min-w-0">
+            <div class="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Primary Health Center</div>
+            <div class="font-bold text-[14px] text-slate-900 leading-tight">Bishnupur Block Primary Health Center (BPHC)</div>
+          </div>
+        </div>
+
+        <!-- Assigned Doctor -->
+        <div class="flex items-start gap-3 mb-4 pb-4 border-b border-slate-100">
+          <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[22px]">stethoscope</span>
+          </div>
+          <div class="min-w-0">
+            <div class="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Assigned Doctor</div>
+            <div class="font-bold text-[14px] text-slate-900 leading-tight">Dr. S. Roy</div>
+            <div class="text-[12px] text-slate-500 mt-0.5">Medical Officer</div>
+          </div>
+        </div>
+
+        <!-- Next Free Eye Camp -->
+        <div class="bg-retisync-ice-light border border-blue-200/60 rounded-xl p-3.5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px] text-retisync-blue">event</span>
+              <span class="font-bold text-[13px] text-retisync-blue">Next Free Eye Camp</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold border border-emerald-200">Free</span>
+          </div>
+          <div class="font-bold text-[15px] text-slate-900 mb-0.5">Thursday, 10:00 AM</div>
+          <div class="text-[12px] text-slate-500 mb-3">Location: Sub-Center 4, Bishnupur</div>
+          <button id="bookSlotBtn" type="button" class="w-full h-10 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[13px] flex items-center justify-center gap-2 active:scale-[0.97] transition-all cursor-pointer shadow-xs">
+            <span class="material-symbols-outlined text-[17px]">calendar_today</span>
+            <span>Book Free Slot</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 6. Accessibility & Emergency -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs animate-card animate-card-d5">
+        <h3 class="font-serif font-bold text-[18px] text-slate-900 leading-tight mb-4">Accessibility &amp; Emergency</h3>
+
+        <!-- Audio Assistance Toggle -->
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[22px]">hearing</span>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-[14px] text-slate-900 leading-tight">Audio Assistance</div>
+              <div class="text-[11.5px] text-slate-500 mt-0.5">Spoken instructions enabled</div>
+            </div>
+          </div>
+          <div id="audioToggle" class="toggle-track active" onclick="toggleAudio()">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <!-- Emergency Family Contact -->
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full bg-red-50 text-retisync-alert-red flex items-center justify-center shrink-0 mt-0.5">
+              <span class="material-symbols-outlined text-[22px]">emergency</span>
+            </div>
+            <div class="min-w-0">
+              <div class="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Emergency Family Contact</div>
+              <div class="font-bold text-[14px] text-slate-900 leading-tight">Ramesh Sharma (Son)</div>
+              <div class="text-[12px] text-slate-500 mt-0.5">+91 98765 43210</div>
+            </div>
+          </div>
+          <a href="tel:+919876543210" class="px-3 py-2 rounded-xl bg-retisync-alert-red text-white font-bold text-[11.5px] flex items-center gap-1 shrink-0 active:scale-95 transition-all shadow-xs hover:opacity-90">
+            <span class="material-symbols-outlined text-[14px]">call</span> Call Now
+          </a>
+        </div>
+
+        <!-- Download Records -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-retisync-ice text-retisync-blue flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[22px]">download</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-[14px] text-slate-900 leading-tight">Download Records / ABHA Card</div>
+            <div class="text-[11.5px] text-slate-500 mt-0.5">PDF format for clinic visits</div>
+          </div>
+          <button id="downloadBtn" type="button" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 active:scale-90 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 7. Log Out Button -->
+      <button id="logoutBtn" type="button" class="w-full h-12 rounded-2xl bg-white border-2 border-red-300 text-retisync-alert-red font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.97] transition-all cursor-pointer hover:bg-red-50 shadow-2xs animate-card animate-card-d6">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        <span>Log Out of Patient Portal</span>
+      </button>
+
+    </main>
+  </div>
+
+  <script>
+    // ============ ABHA COPY ============
+    document.getElementById('copyAbhaBtn').addEventListener('click', () => {
+      const id = document.getElementById('abhaId').textContent;
+      navigator.clipboard.writeText(id.replace(/-/g, '')).then(() => {
+        showToast('Copied!', 'ABHA ID copied to clipboard');
+      }).catch(() => {
+        showToast('Copied!', 'ABHA ID: ' + id);
+      });
+    });
+
+    // ============ SHOW QR ============
+    document.getElementById('showQrBtn').addEventListener('click', () => {
+      document.getElementById('qrModal').classList.add('show');
+    });
+    function closeQR(e) {
+      if (!e || e.target === document.getElementById('qrModal')) {
+        document.getElementById('qrModal').classList.remove('show');
+      }
+    }
+
+    // ============ AUDIO TOGGLE ============
+    let audioEnabled = true;
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const t = document.getElementById('audioToggle');
+      if (audioEnabled) { t.classList.add('active'); } else { t.classList.remove('active'); }
+      showToast(audioEnabled ? 'Audio Enabled' : 'Audio Disabled', audioEnabled ? 'Spoken instructions will play' : 'Spoken instructions turned off');
+    }
+
+    // ============ LISTEN BUTTON ============
+    let isSpeaking = false;
+    document.getElementById('listenBtn').addEventListener('click', () => {
+      if (!('speechSynthesis' in window)) return;
+      if (isSpeaking) { window.speechSynthesis.cancel(); isSpeaking = false; document.getElementById('listenLabel').textContent = 'Listen'; return; }
+      window.speechSynthesis.cancel();
+      const txt = "Patient Profile for Rajesh Sharma. Age 54, Male, from Bishnupur Village Ward 4. ABHA ID: 91 4820 1928 4401. Health Summary: Eye Risk at 78 percent vulnerability. Urgent eye examination recommended. Type 2 Diabetes diagnosed 8 years ago, currently monitored. Hypertension is active. Latest fasting blood sugar is 168 milligrams per deciliter, post-meal is 245 milligrams per deciliter. Your village ASHA worker is Sandhya Didi at Bishnupur Sub-Center. Next free eye camp is Thursday at 10 AM at Sub-Center 4, Bishnupur.";
+      const u = new SpeechSynthesisUtterance(txt);
+      u.rate = 0.92;
+      u.onstart = () => { isSpeaking = true; document.getElementById('listenLabel').textContent = 'Stop'; };
+      u.onend = u.onerror = () => { isSpeaking = false; document.getElementById('listenLabel').textContent = 'Listen'; };
+      window.speechSynthesis.speak(u);
+    });
+
+    // ============ REQUEST HOME VISIT ============
+    document.getElementById('requestVisitBtn').addEventListener('click', () => {
+      showToast('Visit Requested', 'Sandhya Didi will contact you within 24 hours');
+    });
+
+    // ============ BOOK FREE SLOT ============
+    document.getElementById('bookSlotBtn').addEventListener('click', () => {
+      showToast('Slot Booked!', 'Thursday 10:00 AM – Sub-Center 4, Bishnupur');
+    });
+
+    // ============ DOWNLOAD ============
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      showToast('Preparing Download', 'Your health records PDF is being generated');
+    });
+
+    // ============ LOG OUT ============
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('retisync_user');
+      localStorage.removeItem('retisync_readings');
+      window.location.href = 'login.html';
+    });
+
+    // ============ TOAST ============
+    function showToast(title, msg) {
+      const t = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = msg;
+      t.classList.remove('hidden'); t.classList.add('flex');
+      setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 3500);
+    }
+
+    // ============ INIT: Restore Patient Name ============
+    try {
+      const u = JSON.parse(localStorage.getItem('retisync_user') || '{}');
+      if (u.name) {
+        document.getElementById('profileName').textContent = u.name;
+        const parts = u.name.split(' ');
+        const initials = parts.map(p => p[0]).join('').toUpperCase().slice(0,2);
+        document.getElementById('profileInitials').textContent = initials;
+        document.getElementById('headerInitials').textContent = initials;
+      }
+    } catch(e){}
+  </script>
+</body>
+</html>

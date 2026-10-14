@@ -10,6 +10,8 @@
     { "source": "/screens/05-asha-field-worker-home", "destination": "/screens/05-asha-field-worker-home.html" },
     { "source": "/screens/01-asha-patient-dual-login", "destination": "/screens/01-asha-patient-dual-login.html" },
     { "source": "/eye-sugar-check", "destination": "/eye-sugar-check.html" },
-    { "source": "/screens/03-eye-sugar-check", "destination": "/screens/03-eye-sugar-check.html" }
+    { "source": "/screens/03-eye-sugar-check", "destination": "/screens/03-eye-sugar-check.html" },
+    { "source": "/patient-profile", "destination": "/patient-profile.html" },
+    { "source": "/screens/04-patient-profile", "destination": "/screens/04-patient-profile.html" }
   ]
 }
