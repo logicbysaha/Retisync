@@ -1,0 +1,422 @@
+{
+  "patients": [
+    {
+      "id": "pat-001",
+      "name": "Rajesh Sharma",
+      "age": 54,
+      "gender": "M",
+      "phone": "+91 98765 43210",
+      "height": "168 cm",
+      "weight": "62 kg",
+      "village": "Bishnupur Village",
+      "ward": "Ward 1 • Main Para",
+      "abhaId": "91-4820-1928",
+      "subCenter": "Bishnupur Sub-Center 4",
+      "assignedAshaId": "asha-001",
+      "mpin": "4921",
+      "currentRiskScore": 83,
+      "riskLevel": "Urgent Eye Check",
+      "actionAdvised": "Urgent Eye Check & Retinal Scan advised this week",
+      "glucoseHistory": [
+        {
+          "id": "glu-1791960146768",
+          "value": 245,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T06:42:26.768Z",
+          "category": "High Post-Meal",
+          "isCritical": true,
+          "loggedBy": "Rajesh Sharma (Patient)"
+        },
+        {
+          "id": "glu-1791960089780",
+          "value": 245,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T06:41:29.780Z",
+          "category": "High Post-Meal",
+          "isCritical": true,
+          "loggedBy": "Rajesh Sharma (Patient)"
+        },
+        {
+          "id": "glu-1791959852435",
+          "value": 245,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T06:37:32.435Z",
+          "category": "High Post-Meal",
+          "isCritical": true,
+          "loggedBy": "Rajesh Sharma (Patient)"
+        },
+        {
+          "id": "glu-001",
+          "value": 245,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T04:36:29.356Z",
+          "category": "High",
+          "loggedBy": "Patient"
+        },
+        {
+          "id": "glu-002",
+          "value": 158,
+          "timing": "Fasting",
+          "timestamp": "2026-10-13T06:36:29.368Z",
+          "category": "Elevated",
+          "loggedBy": "Patient"
+        },
+        {
+          "id": "glu-003",
+          "value": 210,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-12T06:36:29.368Z",
+          "category": "High",
+          "loggedBy": "Patient"
+        }
+      ],
+      "vitalsHistory": [
+        {
+          "id": "vit-1791960146774",
+          "systolic": 145,
+          "diastolic": 92,
+          "pulse": 78,
+          "weightKg": 62,
+          "timestamp": "2026-10-14T06:42:26.775Z",
+          "recordedBy": "Sandhya Rani Mondal (ASHA)"
+        },
+        {
+          "id": "vit-1791960089786",
+          "systolic": 145,
+          "diastolic": 92,
+          "pulse": 78,
+          "weightKg": 62,
+          "timestamp": "2026-10-14T06:41:29.787Z",
+          "recordedBy": "Sandhya Rani Mondal (ASHA)"
+        },
+        {
+          "id": "vit-1791959852443",
+          "systolic": 145,
+          "diastolic": 92,
+          "pulse": 78,
+          "weightKg": 62,
+          "timestamp": "2026-10-14T06:37:32.443Z",
+          "recordedBy": "Sandhya Rani Mondal (ASHA)"
+        },
+        {
+          "id": "vit-001",
+          "systolic": 138,
+          "diastolic": 88,
+          "pulse": 76,
+          "weightKg": 62,
+          "timestamp": "2026-10-12T06:36:29.368Z",
+          "recordedBy": "Sandhya Rani Mondal (ASHA)"
+        }
+      ]
+    },
+    {
+      "id": "pat-002",
+      "name": "Rabin Das",
+      "age": 54,
+      "gender": "M",
+      "phone": "+91 98765 43211",
+      "height": "165 cm",
+      "weight": "68 kg",
+      "village": "Bishnupur Village",
+      "ward": "Ward 4 • North Para",
+      "abhaId": "91-3829-5541",
+      "subCenter": "Bishnupur Sub-Center 4",
+      "assignedAshaId": "asha-001",
+      "mpin": "1234",
+      "currentRiskScore": 65,
+      "riskLevel": "Stage 1: Mild NPDR",
+      "priority": "Priority 1",
+      "glucoseHistory": [
+        {
+          "id": "glu-004",
+          "value": 168,
+          "timing": "Fasting",
+          "timestamp": "2026-10-14T03:36:29.368Z",
+          "category": "High",
+          "loggedBy": "Sandhya Rani Mondal (ASHA)"
+        }
+      ],
+      "vitalsHistory": [
+        {
+          "id": "vit-002",
+          "systolic": 142,
+          "diastolic": 90,
+          "pulse": 82,
+          "weightKg": 68,
+          "timestamp": "2026-10-14T03:36:29.368Z",
+          "recordedBy": "Sandhya Rani Mondal (ASHA)"
+        }
+      ],
+      "actionAdvised": "Tight glycemic and blood pressure management. Follow-up digital retinal rescan in 6 months by ASHA worker."
+    },
+    {
+      "id": "pat-003",
+      "name": "Parvati Soren",
+      "age": 58,
+      "gender": "F",
+      "phone": "+91 98765 43212",
+      "height": "152 cm",
+      "weight": "55 kg",
+      "village": "Bishnupur Village",
+      "ward": "Ward 2 • Dheko Road",
+      "abhaId": "91-2940-8812",
+      "subCenter": "Bishnupur Sub-Center 4",
+      "assignedAshaId": "asha-001",
+      "mpin": "5678",
+      "currentRiskScore": 65,
+      "riskLevel": "BP + Sugar Spike",
+      "priority": "Priority 2",
+      "glucoseHistory": [
+        {
+          "id": "glu-1791960146812-oz24",
+          "value": 178,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T06:42:26.812Z",
+          "category": "Logged Offline",
+          "loggedBy": "Sandhya Rani Mondal (Offline Field Sync)"
+        },
+        {
+          "id": "glu-1791960089829-e1ad",
+          "value": 178,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T06:41:29.829Z",
+          "category": "Logged Offline",
+          "loggedBy": "Sandhya Rani Mondal (Offline Field Sync)"
+        },
+        {
+          "id": "glu-1791959852491-85p0",
+          "value": 178,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-14T06:37:32.491Z",
+          "category": "Logged Offline",
+          "loggedBy": "Sandhya Rani Mondal (Offline Field Sync)"
+        },
+        {
+          "id": "glu-005",
+          "value": 174,
+          "timing": "Fasting",
+          "timestamp": "2026-10-14T02:36:29.368Z",
+          "category": "High",
+          "loggedBy": "Sandhya Rani Mondal (ASHA)"
+        }
+      ],
+      "vitalsHistory": [
+        {
+          "id": "vit-003",
+          "systolic": 154,
+          "diastolic": 96,
+          "pulse": 84,
+          "weightKg": 55,
+          "timestamp": "2026-10-14T02:36:29.368Z",
+          "recordedBy": "Sandhya Rani Mondal (ASHA)"
+        }
+      ]
+    },
+    {
+      "id": "pat-004",
+      "name": "Meera Mondal",
+      "age": 49,
+      "gender": "F",
+      "phone": "+91 98765 43213",
+      "height": "156 cm",
+      "weight": "58 kg",
+      "village": "Bishnupur Village",
+      "ward": "Ward 3 • South Para",
+      "abhaId": "91-8841-7729",
+      "subCenter": "Bishnupur Sub-Center 4",
+      "assignedAshaId": "asha-001",
+      "mpin": "9012",
+      "currentRiskScore": 28,
+      "riskLevel": "Low Risk",
+      "priority": "Routine",
+      "glucoseHistory": [
+        {
+          "id": "glu-006",
+          "value": 132,
+          "timing": "Post-Meal",
+          "timestamp": "2026-10-13T22:36:29.368Z",
+          "category": "Normal",
+          "loggedBy": "Sandhya Rani Mondal (ASHA)"
+        }
+      ],
+      "vitalsHistory": []
+    }
+  ],
+  "ashaWorkers": [
+    {
+      "id": "asha-001",
+      "name": "Sandhya Rani Mondal",
+      "govtId": "WB-ASHA-884210",
+      "passcode": "Kolkata@2025#",
+      "phone": "+91 98765 00001",
+      "subCenter": "Bishnupur Sub-Center 4, South 24 Parganas",
+      "subCenterShort": "Sub-Center Kotda",
+      "totalAssignedVillagers": 24,
+      "screenedToday": 17,
+      "pendingToday": 7,
+      "avatar": "sandhya_avatar.jpg",
+      "status": "Online & Geofenced"
+    }
+  ],
+  "camps": [
+    {
+      "id": "camp-001",
+      "title": "Village Eye & Glycemic Health Camp",
+      "location": "Bishnupur Sub-Center 4",
+      "scheduleDate": "Thursday, 10:00 AM - 4:00 PM",
+      "doctorName": "Dr. S. Roy (PHC Medical Officer)",
+      "services": [
+        "Free AI Digital Retinal Screening",
+        "Instant Blood Glucose & HbA1c Check",
+        "Free Prescription Eyeglasses",
+        "Specialist Doctor Consultation"
+      ],
+      "totalSlots": 50,
+      "bookedSlots": 19,
+      "status": "Upcoming"
+    }
+  ],
+  "campBookings": [
+    {
+      "id": "cb-1791959852475",
+      "campId": "camp-001",
+      "patientId": "pat-002",
+      "patientName": "Rabin Das",
+      "tokenNumber": "T-019",
+      "bookedAt": "2026-10-14T06:37:32.475Z",
+      "status": "Confirmed"
+    },
+    {
+      "id": "cb-001",
+      "campId": "camp-001",
+      "patientId": "pat-001",
+      "patientName": "Rajesh Sharma",
+      "tokenNumber": "T-019",
+      "bookedAt": "2026-10-13T18:36:29.368Z",
+      "status": "Confirmed"
+    }
+  ],
+  "visits": [
+    {
+      "id": "vis-001",
+      "patientId": "pat-001",
+      "patientName": "Rajesh Sharma",
+      "phone": "+91 98765 43210",
+      "village": "Bishnupur Village",
+      "ward": "Ward 1 • Main Para",
+      "reason": "High Blood Sugar (245 mg/dL) & Urgent Retinal Scan Request",
+      "requestedAt": "2026-10-14T04:36:29.368Z",
+      "status": "Booked",
+      "priority": "Urgent",
+      "assignedAshaId": "asha-001",
+      "notes": "Patient experienced slight blurry vision after morning meal"
+    }
+  ],
+  "screenings": [
+    {
+      "id": "scr-1791960146783",
+      "patientId": "pat-002",
+      "patientName": "Rabin Das",
+      "eyeScanned": "Both Eyes (OD & OS)",
+      "glucoseReading": 168,
+      "bloodPressure": "142/90 mmHg",
+      "drStage": "Stage 1: Mild NPDR",
+      "drStageCode": 1,
+      "confidence": 89.9,
+      "retinopathyRiskScore": 65,
+      "riskLevel": "Moderate Risk",
+      "macularEdemaRisk": "Low Risk",
+      "lesionsFound": [
+        "Isolated microaneurysms noted in posterior pole",
+        "No neovascularization or venous beading observed"
+      ],
+      "clinicalRecommendation": "Tight glycemic and blood pressure management. Follow-up digital retinal rescan in 6 months by ASHA worker.",
+      "urgency": "Priority",
+      "scannedAt": "2026-10-14T06:42:26.783Z",
+      "scannedBy": "Sandhya Rani Mondal (ASHA)",
+      "imageUrl": null
+    },
+    {
+      "id": "scr-1791960089798",
+      "patientId": "pat-002",
+      "patientName": "Rabin Das",
+      "eyeScanned": "Both Eyes (OD & OS)",
+      "glucoseReading": 168,
+      "bloodPressure": "142/90 mmHg",
+      "drStage": "Stage 1: Mild NPDR",
+      "drStageCode": 1,
+      "confidence": 94.7,
+      "retinopathyRiskScore": 65,
+      "riskLevel": "Moderate Risk",
+      "macularEdemaRisk": "Low Risk",
+      "lesionsFound": [
+        "Isolated microaneurysms noted in posterior pole",
+        "No neovascularization or venous beading observed"
+      ],
+      "clinicalRecommendation": "Tight glycemic and blood pressure management. Follow-up digital retinal rescan in 6 months by ASHA worker.",
+      "urgency": "Priority",
+      "scannedAt": "2026-10-14T06:41:29.798Z",
+      "scannedBy": "Sandhya Rani Mondal (ASHA)",
+      "imageUrl": null
+    },
+    {
+      "id": "scr-1791959852457",
+      "patientId": "pat-002",
+      "patientName": "Rabin Das",
+      "eyeScanned": "Both Eyes (OD & OS)",
+      "glucoseReading": 168,
+      "bloodPressure": "142/90 mmHg",
+      "drStage": "Stage 1: Mild NPDR",
+      "drStageCode": 1,
+      "confidence": 93.7,
+      "retinopathyRiskScore": 65,
+      "riskLevel": "Moderate Risk",
+      "macularEdemaRisk": "Low Risk",
+      "lesionsFound": [
+        "Isolated microaneurysms noted in posterior pole",
+        "No neovascularization or venous beading observed"
+      ],
+      "clinicalRecommendation": "Tight glycemic and blood pressure management. Follow-up digital retinal rescan in 6 months by ASHA worker.",
+      "urgency": "Priority",
+      "scannedAt": "2026-10-14T06:37:32.457Z",
+      "scannedBy": "Sandhya Rani Mondal (ASHA)",
+      "imageUrl": null
+    },
+    {
+      "id": "scr-001",
+      "patientId": "pat-002",
+      "patientName": "Rabin Das",
+      "eyeScanned": "Both Eyes (OD & OS)",
+      "glucoseReading": 168,
+      "drStage": "Stage 2: Moderate NPDR",
+      "drStageCode": 2,
+      "confidence": 93.4,
+      "retinopathyRiskScore": 78,
+      "lesionsFound": [
+        "Microaneurysms detected in nasal quadrant",
+        "Blot hemorrhages observed near macula",
+        "Mild hard exudate ring"
+      ],
+      "macularEdemaRisk": "Moderate",
+      "clinicalRecommendation": "Refer to BPHC Ophthalmology within 7 days for dilated fundus examination and OCT scan.",
+      "urgency": "High",
+      "scannedAt": "2026-10-14T00:36:29.368Z",
+      "scannedBy": "Sandhya Rani Mondal (ASHA)",
+      "imageUrl": null
+    }
+  ],
+  "doctors": [
+    {
+      "id": "doc-001",
+      "name": "Dr. S. Roy",
+      "role": "PHC Medical Officer",
+      "department": "Ophthalmology & General Medicine",
+      "center": "Bishnupur Primary Health Center (BPHC)",
+      "phone": "+91 33 2456 7890",
+      "emergencyHelpline": "1800-11-4477",
+      "availability": "On-duty at Bishnupur PHC Emergency Desk",
+      "status": "Available"
+    }
+  ],
+  "teleconsultations": []
+}

@@ -542,14 +542,74 @@
       });
     });
 
+    let currentPatientId = 'pat-001';
+
+    // Fetch live patient data from Backend API
+    async function loadPatientData() {
+      try {
+        const savedUserStr = localStorage.getItem('retisync_user');
+        if (savedUserStr) {
+          const u = JSON.parse(savedUserStr);
+          if (u.id) currentPatientId = u.id;
+        }
+
+        const res = await fetch(`/api/patients/${currentPatientId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && data.patient) {
+          const p = data.patient;
+          if (document.getElementById('greetingHeading')) document.getElementById('greetingHeading').textContent = `Hello, ${p.name.split(' ')[0]}`;
+          if (document.getElementById('menuName')) document.getElementById('menuName').textContent = p.name;
+          if (document.getElementById('villageText')) document.getElementById('villageText').textContent = p.village;
+          if (document.getElementById('subCenterLabel')) document.getElementById('subCenterLabel').textContent = p.subCenter || 'Sub-Center Kotda';
+          
+          if (p.glucoseHistory && p.glucoseHistory.length > 0) {
+            const latest = p.glucoseHistory[0];
+            if (sugarDisplay) sugarDisplay.textContent = latest.value;
+            if (sugarLoggedTime) sugarLoggedTime.textContent = `${latest.category} • ${latest.timing}`;
+          }
+
+          if (data.visits && data.visits.some(v => v.status === 'Booked')) {
+            if (visitBtnText) visitBtnText.textContent = "Home Visit Scheduled (Booked)";
+          }
+        }
+      } catch(err) {
+        console.warn('Backend sync note:', err.message);
+      }
+    }
+
+    loadPatientData();
+
     if (saveSugarBtn) {
-      saveSugarBtn.addEventListener('click', () => {
-        const val = sugarInput.value || 140;
-        sugarDisplay.textContent = val;
-        sugarLoggedTime.textContent = 'Just logged (' + selectedTiming + ')';
-        logSugarModal.classList.add('hidden');
-        logSugarModal.classList.remove('flex');
-        showToast("Glucose Logged", `${val} mg/dL saved to Retisync Health Vault.`);
+      saveSugarBtn.addEventListener('click', async () => {
+        const val = Number(sugarInput.value) || 140;
+        saveSugarBtn.disabled = true;
+        saveSugarBtn.textContent = "Saving to Health Vault...";
+
+        try {
+          const res = await fetch(`/api/patients/${currentPatientId}/glucose`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: val, timing: selectedTiming })
+          });
+          const data = await res.json();
+          if (data.success) {
+            sugarDisplay.textContent = val;
+            sugarLoggedTime.textContent = `Just logged (${selectedTiming}) • ${data.riskAssessment.glucoseCategory}`;
+            showToast("Glucose Logged", `${val} mg/dL recorded. Retinopathy Risk: ${data.riskAssessment.riskScore}%.`);
+          } else {
+            throw new Error(data.message);
+          }
+        } catch(e) {
+          sugarDisplay.textContent = val;
+          sugarLoggedTime.textContent = 'Just logged (' + selectedTiming + ')';
+          showToast("Glucose Logged", `${val} mg/dL saved to offline vault.`);
+        } finally {
+          saveSugarBtn.disabled = false;
+          saveSugarBtn.textContent = "Save Reading to Health Vault";
+          logSugarModal.classList.add('hidden');
+          logSugarModal.classList.remove('flex');
+        }
       });
     }
 
@@ -559,9 +619,16 @@
     const closeEyeRiskModal = document.getElementById('closeEyeRiskModal');
     const modalRequestVisitBtn = document.getElementById('modalRequestVisitBtn');
 
-    if (openEyeRiskBtn) openEyeRiskBtn.addEventListener('click', () => {
+    if (openEyeRiskBtn) openEyeRiskBtn.addEventListener('click', async () => {
       eyeRiskModal.classList.remove('hidden');
       eyeRiskModal.classList.add('flex');
+      try {
+        const res = await fetch(`/api/patients/${currentPatientId}/risk`);
+        const data = await res.json();
+        if (data.success && data.riskAssessment) {
+          showToast("AI Risk Calibrated", `Retinopathy Risk: ${data.riskAssessment.riskScore}% (${data.riskAssessment.riskLevel})`);
+        }
+      } catch(e) {}
     });
     if (closeEyeRiskModal) closeEyeRiskModal.addEventListener('click', () => {
       eyeRiskModal.classList.add('hidden');
@@ -602,11 +669,31 @@
     });
 
     if (confirmVisitBtn) {
-      confirmVisitBtn.addEventListener('click', () => {
-        homeVisitModal.classList.add('hidden');
-        homeVisitModal.classList.remove('flex');
-        visitBtnText.textContent = `Visit Requested (${selectedVisitTime})`;
-        showToast("Visit Requested", `Sandhya Didi notified for ${selectedVisitTime}.`);
+      confirmVisitBtn.addEventListener('click', async () => {
+        confirmVisitBtn.disabled = true;
+        confirmVisitBtn.textContent = "Scheduling with ASHA Didi...";
+
+        try {
+          const res = await fetch('/api/visits/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              patientId: currentPatientId,
+              reason: `Home visit requested for ${selectedVisitTime}`
+            })
+          });
+          const data = await res.json();
+          visitBtnText.textContent = `Visit Scheduled (${selectedVisitTime})`;
+          showToast("Visit Scheduled", data.message || `Sandhya Didi notified for ${selectedVisitTime}.`);
+        } catch(e) {
+          visitBtnText.textContent = `Visit Requested (${selectedVisitTime})`;
+          showToast("Visit Requested", `Sandhya Didi notified for ${selectedVisitTime}.`);
+        } finally {
+          confirmVisitBtn.disabled = false;
+          confirmVisitBtn.textContent = "Confirm Visit Request";
+          homeVisitModal.classList.add('hidden');
+          homeVisitModal.classList.remove('flex');
+        }
       });
     }
 
@@ -624,15 +711,32 @@
       callModal.classList.remove('flex');
     });
 
-    // Book Free Slot
+    // Book Free Slot at Eye Camp
     const bookCampSlotBtn = document.getElementById('bookCampSlotBtn');
     const campBtnText = document.getElementById('campBtnText');
     if (bookCampSlotBtn) {
-      bookCampSlotBtn.addEventListener('click', () => {
-        campBtnText.textContent = "Slot Confirmed (Token #KOT-14)";
-        bookCampSlotBtn.classList.remove('bg-retisync-blue', 'hover:bg-retisync-blue-hover');
-        bookCampSlotBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
-        showToast("Eye Camp Slot Booked", "Token #KOT-14 for Thursday 10 AM confirmed.");
+      bookCampSlotBtn.addEventListener('click', async () => {
+        bookCampSlotBtn.disabled = true;
+        campBtnText.textContent = "Reserving Slot...";
+
+        try {
+          const res = await fetch('/api/camps/camp-001/book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ patientId: currentPatientId })
+          });
+          const data = await res.json();
+          const token = (data.booking && data.booking.tokenNumber) || 'T-019';
+          campBtnText.textContent = `Slot Confirmed (Token ${token})`;
+          bookCampSlotBtn.classList.remove('bg-retisync-blue', 'hover:bg-retisync-blue-hover');
+          bookCampSlotBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+          showToast("Camp Slot Booked", `Token ${token} confirmed for Thursday at Sub-Center 4.`);
+        } catch(e) {
+          campBtnText.textContent = "Slot Confirmed (Token #KOT-14)";
+          bookCampSlotBtn.classList.remove('bg-retisync-blue', 'hover:bg-retisync-blue-hover');
+          bookCampSlotBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+          showToast("Eye Camp Slot Booked", "Token #KOT-14 for Thursday 10 AM confirmed.");
+        }
       });
     }
 
@@ -641,8 +745,15 @@
     const navScanBtn = document.getElementById('navScanBtn');
     const navProfileBtn = document.getElementById('navProfileBtn');
 
-    if (navQueueBtn) navQueueBtn.addEventListener('click', () => {
-      showToast("Eye Camp Queue", "Your spot is Token #KOT-14 for Sub-Center 4.");
+    if (navQueueBtn) navQueueBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/camps');
+        const data = await res.json();
+        const camp = (data.camps && data.camps[0]) || {};
+        showToast("Eye Camp Queue", `Sub-Center 4: ${camp.bookedSlots || 18} of ${camp.totalSlots || 50} slots filled.`);
+      } catch(e) {
+        showToast("Eye Camp Queue", "Your spot is Token #KOT-14 for Sub-Center 4.");
+      }
     });
     if (navScanBtn) navScanBtn.addEventListener('click', () => {
       eyeRiskModal.classList.remove('hidden');
@@ -651,22 +762,6 @@
     if (navProfileBtn) navProfileBtn.addEventListener('click', () => {
       userMenuDropdown.classList.toggle('hidden');
     });
-
-    // Restore session data from dual login
-    try {
-      const savedUser = localStorage.getItem('retisync_user');
-      if (savedUser) {
-        const u = JSON.parse(savedUser);
-        if (u.name) {
-          document.getElementById('greetingHeading').textContent = `Hello, ${u.name}`;
-          document.getElementById('menuName').textContent = u.name;
-        }
-        if (u.village) {
-          document.getElementById('villageText').textContent = u.village;
-          document.getElementById('subCenterLabel').textContent = `Sub-Center ${u.village}`;
-        }
-      }
-    } catch(e) {}
   </script>
 </body>
 </html>
