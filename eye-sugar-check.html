@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Eye &amp; Sugar Check | Retisync Drishti Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "retisync-blue": "#0a58ca",
+            "retisync-blue-hover": "#0849a6",
+            "retisync-navy": "#061e47",
+            "retisync-ice": "#dbe9fe",
+            "retisync-ice-light": "#edf4fe",
+            "retisync-pill": "#cfe2ff",
+            "retisync-alert-red": "#c92a2a",
+            "retisync-pink": "#ffe8e8",
+            "retisync-peach": "#ffe3e3"
+          },
+          fontFamily: {
+            "sans": ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+            "serif": ["'DM Serif Display'", "Georgia", "serif"],
+            "bengali": ["'Noto Sans Bengali'", "'Inter'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body { width:100%; margin:0; padding:0; min-height:100%; background:#0b1329; }
+    body { overscroll-behavior-y:none; }
+    ::-webkit-scrollbar { display:none; }
+    .pb-safe { padding-bottom: max(env(safe-area-inset-bottom,0px),1rem); }
+    .pt-safe { padding-top: max(env(safe-area-inset-top,0px),0.75rem); }
+
+    /* Custom range slider */
+    input[type=range] { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none; cursor:pointer; }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; appearance:none;
+      width:22px; height:22px; border-radius:50%;
+      background:#0a58ca; border:3px solid #fff;
+      box-shadow:0 1px 6px rgba(10,88,202,0.4);
+      cursor:pointer; margin-top:-2px;
+    }
+    input[type=range]::-moz-range-thumb {
+      width:22px; height:22px; border-radius:50%;
+      background:#0a58ca; border:3px solid #fff;
+      box-shadow:0 1px 6px rgba(10,88,202,0.4);
+      cursor:pointer;
+    }
+
+    .toast-anim { animation: slideDown 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+    @keyframes slideDown {
+      from { transform:translate(-50%,-100%); opacity:0; }
+      to { transform:translate(-50%,0); opacity:1; }
+    }
+    @keyframes pulseRisk {
+      0%,100% { transform:scale(1); }
+      50% { transform:scale(1.04); }
+    }
+    .risk-pulse { animation: pulseRisk 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-[#0b1329] text-slate-900 font-sans antialiased flex justify-center min-h-screen">
+
+  <!-- Toast -->
+  <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-[90%] px-4 py-3 rounded-2xl bg-[#061e47] text-white shadow-2xl border border-blue-400/30 items-center gap-3 toast-anim">
+    <div class="w-8 h-8 rounded-full bg-retisync-blue flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[18px]">check</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div id="toastTitle" class="text-[13px] font-bold leading-tight">Saved</div>
+      <div id="toastMessage" class="text-[11.5px] text-blue-200 leading-tight mt-0.5">Reading recorded</div>
+    </div>
+  </div>
+
+  <!-- GROUNDED MOBILE FRAME -->
+  <div class="w-full max-w-md bg-[#f6f9fc] min-h-screen shadow-2xl border-x border-slate-300/40 relative flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 inset-x-0 z-40 bg-white border-b border-slate-200/90 shadow-2xs pt-safe">
+      <div class="h-16 px-4 flex items-center justify-between">
+        <div class="flex items-center gap-3 min-w-0">
+          <a href="patient-home.html" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-[20px] text-slate-700">arrow_back</span>
+          </a>
+          <div class="min-w-0">
+            <h1 class="font-serif font-bold text-[20px] text-slate-900 tracking-tight leading-tight truncate">Eye &amp; Sugar Check</h1>
+            <span class="text-[11.5px] text-slate-500 font-medium">Daily Health Screening</span>
+          </div>
+        </div>
+        <button id="audioBtn" type="button" class="w-10 h-10 rounded-full bg-retisync-ice hover:bg-[#cde2fd] text-retisync-blue flex items-center justify-center shrink-0 active:scale-95 transition-all cursor-pointer" title="Listen">
+          <span id="audioIcon" class="material-symbols-outlined text-[22px]">volume_up</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 flex flex-col gap-4 p-4 pb-28">
+
+      <!-- Patient Info Card -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-4.5 shadow-2xs">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-retisync-blue text-white flex items-center justify-center font-serif font-bold text-[16px] shadow-xs shrink-0">
+              <span id="patientInitials">RS</span>
+            </div>
+            <div class="min-w-0">
+              <h2 id="patientName" class="font-serif font-bold text-[18px] text-slate-900 leading-tight">Rajesh Sharma</h2>
+              <span id="patientMeta" class="text-[12.5px] text-slate-500">Age: 54 • Male</span>
+            </div>
+          </div>
+          <div id="hyperBadge" class="px-3 py-1 rounded-xl bg-retisync-ice border border-blue-200/80 text-center shrink-0">
+            <span class="text-[10px] font-bold text-slate-500 block leading-tight">Hypertension:</span>
+            <span class="text-[12px] font-bold text-retisync-blue">Yes</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-2.5 border-t border-slate-100">
+          <span class="text-[13px] text-slate-500 font-medium">Medical Condition:</span>
+          <span id="medCondition" class="font-bold text-[14px] text-slate-900">Type 2 Diabetes (8 Years)</span>
+        </div>
+      </div>
+
+      <!-- Blood Sugar Measurements Card -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs">
+        <div class="mb-4">
+          <h3 class="font-serif font-bold text-[18px] text-slate-900 leading-tight">Blood Sugar Measurements</h3>
+          <p class="text-[12.5px] text-slate-500 mt-0.5">Enter your latest glucometer readings</p>
+        </div>
+
+        <!-- Fasting Sugar (FPG) -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <label class="font-bold text-[14px] text-slate-800">Morning Fasting Sugar (FPG)</label>
+            <div class="bg-retisync-ice-light border border-blue-200/70 rounded-xl px-3 py-1 min-w-[80px] text-center">
+              <span id="fpgValue" class="font-serif font-bold text-[18px] text-retisync-blue">168</span>
+              <span class="text-[10.5px] text-slate-500 font-semibold ml-0.5">mg/dL</span>
+            </div>
+          </div>
+          <div class="relative mt-1">
+            <input type="range" id="fpgSlider" min="50" max="350" value="168" class="w-full" style="background: linear-gradient(to right, #22c55e 0%, #22c55e 28.5%, #eab308 28.5%, #eab308 42.8%, #ef4444 42.8%, #ef4444 100%);">
+          </div>
+          <div class="flex justify-between mt-1.5 text-[10.5px] font-semibold">
+            <span class="text-emerald-600">Normal (&lt;100)</span>
+            <span class="text-amber-600">Borderline (100-125)</span>
+            <span id="fpgRangeLabel" class="text-red-600 font-bold">High (&gt;126)</span>
+          </div>
+        </div>
+
+        <!-- Post-Meal Sugar (PPG) -->
+        <div class="mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <label class="font-bold text-[14px] text-slate-800">2-Hour Post Meal Sugar (PPG)</label>
+            <div class="bg-retisync-ice-light border border-blue-200/70 rounded-xl px-3 py-1 min-w-[80px] text-center">
+              <span id="ppgValue" class="font-serif font-bold text-[18px] text-retisync-blue">245</span>
+              <span class="text-[10.5px] text-slate-500 font-semibold ml-0.5">mg/dL</span>
+            </div>
+          </div>
+          <div class="relative mt-1">
+            <input type="range" id="ppgSlider" min="50" max="450" value="245" class="w-full" style="background: linear-gradient(to right, #22c55e 0%, #22c55e 22.5%, #eab308 22.5%, #eab308 37.5%, #ef4444 37.5%, #ef4444 100%);">
+          </div>
+          <div class="flex justify-between mt-1.5 text-[10.5px] font-semibold">
+            <span class="text-emerald-600">Target (&lt;140)</span>
+            <span class="text-amber-600">High (140-199)</span>
+            <span id="ppgRangeLabel" class="text-red-600 font-bold">Severe (&gt;200)</span>
+          </div>
+        </div>
+
+        <!-- Additional Inputs -->
+        <div class="grid grid-cols-2 gap-3 mb-5">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">HbA1c (%)</label>
+            <input type="number" id="hba1cInput" value="8.2" step="0.1" min="3" max="18" class="w-full h-11 px-3 rounded-xl border border-slate-300 font-bold text-[15px] text-slate-900 outline-none focus:border-retisync-blue focus:ring-2 focus:ring-blue-500/20"/>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Diabetes Duration</label>
+            <select id="durationSelect" class="w-full h-11 px-3 rounded-xl border border-slate-300 font-bold text-[13px] text-slate-900 bg-white outline-none focus:border-retisync-blue">
+              <option value="2">&lt; 5 Years</option>
+              <option value="5">5-10 Years</option>
+              <option value="8" selected>8+ Years</option>
+              <option value="15">15+ Years</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Check Button -->
+        <button id="checkRiskBtn" type="button" class="w-full h-13 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[15px] flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[22px]">visibility</span>
+          <span>Check My Eye Risk</span>
+        </button>
+      </div>
+
+      <!-- Risk Results Section (hidden initially, shown after calculation) -->
+      <div id="riskResultSection" class="hidden flex flex-col gap-4 transition-all">
+
+        <!-- Risk Score Card -->
+        <div id="riskCard" class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs risk-pulse">
+          <div class="mb-3">
+            <span class="text-[10.5px] font-bold uppercase tracking-wider text-retisync-blue block">3-Month Retinopathy Risk</span>
+          </div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span id="riskPercent" class="font-serif font-bold text-[52px] text-retisync-blue leading-none tracking-tight">78%</span>
+            <span id="riskLabel" class="text-[14px] font-semibold text-slate-600">(Urgent Attention Needed)</span>
+          </div>
+          <!-- Risk Progress Bar -->
+          <div class="mt-3 mb-2">
+            <div class="w-full h-3 rounded-full overflow-hidden bg-slate-200">
+              <div id="riskBar" class="h-full rounded-full transition-all duration-1000 ease-out" style="width:78%; background: linear-gradient(90deg, #22c55e 0%, #eab308 40%, #ef4444 70%, #991b1b 100%);"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-[9.5px] font-semibold text-slate-500">
+              <span>Low (0-25%)</span>
+              <span>Moderate (25-50%)</span>
+              <span>High (50-75%)</span>
+              <span>Critical (75%+)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Breakdown -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs space-y-4">
+          <!-- Explanation -->
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-retisync-blue text-[20px]">info</span>
+              <h4 class="font-bold text-[14px] text-slate-900 uppercase tracking-wider">Simple Explanation</h4>
+            </div>
+            <p id="explanationText" class="text-[13px] text-slate-700 leading-relaxed">
+              Your blood sugar spiked to <strong>245 mg/dL</strong> after meals.
+              High sugar spikes weaken tiny blood vessels in the back of your eye over time,
+              which can lead to vision loss if not checked early.
+            </p>
+          </div>
+
+          <!-- Risk Factor Breakdown -->
+          <div class="space-y-2">
+            <h4 class="font-bold text-[12px] text-slate-500 uppercase tracking-wider">Contributing Factors</h4>
+            <div id="factorsList" class="space-y-1.5">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Recommended Action -->
+          <div class="bg-retisync-ice-light border border-blue-200/60 rounded-xl p-4">
+            <h4 class="font-bold text-[13px] text-retisync-alert-red uppercase tracking-wider mb-1.5">Recommended Action</h4>
+            <p id="recommendedAction" class="text-[12.5px] text-slate-700 leading-relaxed">
+              Visit your local health center or ASHA worker for an eye photo scan.
+            </p>
+          </div>
+        </div>
+
+        <!-- History Log -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+            <h4 class="font-serif font-bold text-[16px] text-slate-900">Recent Readings Log</h4>
+            <span id="logCount" class="text-[11px] text-retisync-blue font-bold bg-retisync-ice px-2 py-0.5 rounded-full">0 saved</span>
+          </div>
+          <div id="readingsList" class="space-y-2 max-h-48 overflow-y-auto">
+            <div class="text-center text-[12px] text-slate-400 py-4">
+              <span class="material-symbols-outlined text-[28px] block mb-1">history</span>
+              No readings saved yet. Tap "Check My Eye Risk" to log your first reading.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Fixed Bottom Action Bar -->
+    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40 bg-white border-t border-x border-slate-300/40 shadow-lg pb-safe">
+      <div class="flex items-center gap-2.5 px-4 py-3">
+        <button id="callAshaBtn" type="button" class="flex-1 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[13.5px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer border border-slate-200">
+          <span class="material-symbols-outlined text-[19px]">call</span>
+          <span>Call ASHA</span>
+        </button>
+        <button id="findClinicBtn" type="button" class="flex-[1.3] h-12 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[13.5px] flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[19px]">location_on</span>
+          <span>Find Nearest Clinic</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ============ DOM REFS ============
+    const fpgSlider = document.getElementById('fpgSlider');
+    const ppgSlider = document.getElementById('ppgSlider');
+    const fpgValue  = document.getElementById('fpgValue');
+    const ppgValue  = document.getElementById('ppgValue');
+    const fpgRangeLabel = document.getElementById('fpgRangeLabel');
+    const ppgRangeLabel = document.getElementById('ppgRangeLabel');
+    const hba1cInput = document.getElementById('hba1cInput');
+    const durationSelect = document.getElementById('durationSelect');
+    const checkRiskBtn = document.getElementById('checkRiskBtn');
+    const riskResultSection = document.getElementById('riskResultSection');
+    const riskPercent  = document.getElementById('riskPercent');
+    const riskLabel    = document.getElementById('riskLabel');
+    const riskBar      = document.getElementById('riskBar');
+    const riskCard     = document.getElementById('riskCard');
+    const explanationText = document.getElementById('explanationText');
+    const recommendedAction = document.getElementById('recommendedAction');
+    const factorsList = document.getElementById('factorsList');
+    const readingsList = document.getElementById('readingsList');
+    const logCount = document.getElementById('logCount');
+
+    // ============ SLIDER LIVE UPDATE ============
+    fpgSlider.addEventListener('input', () => {
+      fpgValue.textContent = fpgSlider.value;
+      updateFPGLabel(+fpgSlider.value);
+    });
+    ppgSlider.addEventListener('input', () => {
+      ppgValue.textContent = ppgSlider.value;
+      updatePPGLabel(+ppgSlider.value);
+    });
+
+    function updateFPGLabel(v) {
+      if (v < 100) {
+        fpgRangeLabel.textContent = 'Normal (<100)';
+        fpgRangeLabel.className = 'text-emerald-600 font-bold';
+      } else if (v <= 125) {
+        fpgRangeLabel.textContent = 'Borderline (100-125)';
+        fpgRangeLabel.className = 'text-amber-600 font-bold';
+      } else {
+        fpgRangeLabel.textContent = 'High (>126)';
+        fpgRangeLabel.className = 'text-red-600 font-bold';
+      }
+    }
+    function updatePPGLabel(v) {
+      if (v < 140) {
+        ppgRangeLabel.textContent = 'Target (<140)';
+        ppgRangeLabel.className = 'text-emerald-600 font-bold';
+      } else if (v <= 199) {
+        ppgRangeLabel.textContent = 'High (140-199)';
+        ppgRangeLabel.className = 'text-amber-600 font-bold';
+      } else {
+        ppgRangeLabel.textContent = 'Severe (>200)';
+        ppgRangeLabel.className = 'text-red-600 font-bold';
+      }
+    }
+
+    // ============ RISK CALCULATION ENGINE ============
+    // A simplified clinical scoring model inspired by actual DR risk factors:
+    //   FPG severity, PPG severity, HbA1c, diabetes duration, hypertension
+    function calculateRetinopathyRisk(fpg, ppg, hba1c, durationYears, hasHypertension) {
+      let risk = 0;
+
+      // 1. Fasting Plasma Glucose contribution (0-20 pts)
+      if (fpg < 100) risk += 2;
+      else if (fpg < 126) risk += 8;
+      else if (fpg < 160) risk += 14;
+      else if (fpg < 200) risk += 18;
+      else risk += 22;
+
+      // 2. Post-prandial Glucose contribution (0-25 pts)
+      if (ppg < 140) risk += 3;
+      else if (ppg < 180) risk += 10;
+      else if (ppg < 220) risk += 16;
+      else if (ppg < 280) risk += 22;
+      else risk += 28;
+
+      // 3. HbA1c contribution (0-25 pts)
+      if (hba1c < 5.7) risk += 2;
+      else if (hba1c < 6.5) risk += 8;
+      else if (hba1c < 7.5) risk += 14;
+      else if (hba1c < 9.0) risk += 20;
+      else risk += 26;
+
+      // 4. Diabetes duration (0-15 pts)
+      if (durationYears < 5) risk += 4;
+      else if (durationYears < 10) risk += 10;
+      else risk += 16;
+
+      // 5. Hypertension co-morbidity (0-10 pts)
+      if (hasHypertension) risk += 10;
+
+      // Normalize to 0-100%
+      const maxScore = 22 + 28 + 26 + 16 + 10; // 102
+      let pct = Math.round((risk / maxScore) * 100);
+      pct = Math.min(pct, 99);
+      pct = Math.max(pct, 5);
+
+      return pct;
+    }
+
+    function getRiskCategory(pct) {
+      if (pct <= 25) return { label: '(Low Risk – Monitor Annually)', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', action: 'Continue monitoring your blood sugar. Annual eye check-up is recommended. Maintain a healthy diet and regular exercise.' };
+      if (pct <= 50) return { label: '(Moderate Risk – Screening Advised)', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200', action: 'Schedule an eye screening within the next 3 months. Control your blood sugar with prescribed medication. Reduce sugar intake and monitor weekly.' };
+      if (pct <= 75) return { label: '(High Risk – Action Required)', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200', action: 'Urgent: Visit your local health center or ASHA worker for an eye photo scan within 2 weeks. Consult your doctor about adjusting diabetes medication.' };
+      return { label: '(Urgent Attention Needed)', color: 'text-red-700', bg: 'bg-red-50 border-red-200', action: 'Critical: Visit your local health center or ASHA worker for an eye photo scan immediately. Uncontrolled sugar is actively damaging retinal blood vessels. See a doctor within 1 week.' };
+    }
+
+    function buildFactors(fpg, ppg, hba1c, dur, hyp) {
+      const factors = [];
+      // FPG
+      if (fpg >= 126) factors.push({ icon: 'water_drop', label: `Fasting Sugar: ${fpg} mg/dL`, severity: 'High', sClass: 'text-red-600 bg-red-50' });
+      else if (fpg >= 100) factors.push({ icon: 'water_drop', label: `Fasting Sugar: ${fpg} mg/dL`, severity: 'Borderline', sClass: 'text-amber-600 bg-amber-50' });
+      else factors.push({ icon: 'water_drop', label: `Fasting Sugar: ${fpg} mg/dL`, severity: 'Normal', sClass: 'text-emerald-600 bg-emerald-50' });
+
+      // PPG
+      if (ppg >= 200) factors.push({ icon: 'local_dining', label: `Post-Meal Sugar: ${ppg} mg/dL`, severity: 'Severe', sClass: 'text-red-600 bg-red-50' });
+      else if (ppg >= 140) factors.push({ icon: 'local_dining', label: `Post-Meal Sugar: ${ppg} mg/dL`, severity: 'High', sClass: 'text-amber-600 bg-amber-50' });
+      else factors.push({ icon: 'local_dining', label: `Post-Meal Sugar: ${ppg} mg/dL`, severity: 'Normal', sClass: 'text-emerald-600 bg-emerald-50' });
+
+      // HbA1c
+      if (hba1c >= 7.5) factors.push({ icon: 'science', label: `HbA1c: ${hba1c}%`, severity: 'Poor Control', sClass: 'text-red-600 bg-red-50' });
+      else if (hba1c >= 6.5) factors.push({ icon: 'science', label: `HbA1c: ${hba1c}%`, severity: 'Diabetic', sClass: 'text-amber-600 bg-amber-50' });
+      else factors.push({ icon: 'science', label: `HbA1c: ${hba1c}%`, severity: 'Good', sClass: 'text-emerald-600 bg-emerald-50' });
+
+      // Duration
+      factors.push({ icon: 'schedule', label: `Diabetes Duration: ${dur}+ years`, severity: dur >= 10 ? 'Long-term' : dur >= 5 ? 'Medium' : 'Short', sClass: dur >= 10 ? 'text-red-600 bg-red-50' : dur >= 5 ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50' });
+
+      // Hypertension
+      if (hyp) factors.push({ icon: 'vital_signs', label: 'Hypertension: Yes', severity: 'Co-morbid', sClass: 'text-red-600 bg-red-50' });
+      else factors.push({ icon: 'vital_signs', label: 'Hypertension: No', severity: 'None', sClass: 'text-emerald-600 bg-emerald-50' });
+
+      return factors;
+    }
+
+    // ============ READINGS HISTORY ============
+    let savedReadings = JSON.parse(localStorage.getItem('retisync_readings') || '[]');
+
+    function renderReadings() {
+      logCount.textContent = `${savedReadings.length} saved`;
+      if (savedReadings.length === 0) {
+        readingsList.innerHTML = `
+          <div class="text-center text-[12px] text-slate-400 py-4">
+            <span class="material-symbols-outlined text-[28px] block mb-1">history</span>
+            No readings saved yet. Tap "Check My Eye Risk" to log your first reading.
+          </div>`;
+        return;
+      }
+      readingsList.innerHTML = savedReadings.slice().reverse().map((r, i) => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl ${i === 0 ? 'bg-retisync-ice-light border border-blue-200/60' : 'bg-slate-50 border border-slate-200/60'}">
+          <div>
+            <div class="font-bold text-[12.5px] text-slate-800">FPG ${r.fpg} • PPG ${r.ppg} mg/dL</div>
+            <div class="text-[10.5px] text-slate-500">HbA1c ${r.hba1c}% • ${r.time}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-serif font-bold text-[16px] ${r.risk > 75 ? 'text-red-600' : r.risk > 50 ? 'text-orange-600' : r.risk > 25 ? 'text-amber-600' : 'text-emerald-600'}">${r.risk}%</div>
+            <div class="text-[9.5px] text-slate-500 font-semibold">risk</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============ CHECK RISK ACTION ============
+    checkRiskBtn.addEventListener('click', () => {
+      const fpg = +fpgSlider.value;
+      const ppg = +ppgSlider.value;
+      const hba1c = parseFloat(hba1cInput.value) || 6.0;
+      const dur = +durationSelect.value;
+      const hyp = true; // from patient profile
+
+      const riskPct = calculateRetinopathyRisk(fpg, ppg, hba1c, dur, hyp);
+      const cat = getRiskCategory(riskPct);
+      const factors = buildFactors(fpg, ppg, hba1c, dur, hyp);
+
+      // Animate display
+      riskResultSection.classList.remove('hidden');
+      riskResultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Score display
+      riskPercent.textContent = riskPct + '%';
+      riskLabel.textContent = cat.label;
+      riskLabel.className = `text-[14px] font-semibold ${cat.color}`;
+
+      // Risk bar
+      setTimeout(() => { riskBar.style.width = riskPct + '%'; }, 100);
+
+      // Card border color
+      if (riskPct > 75) riskCard.className = 'bg-red-50/60 border-2 border-red-300 rounded-2xl p-5 shadow-2xs risk-pulse';
+      else if (riskPct > 50) riskCard.className = 'bg-orange-50/60 border-2 border-orange-300 rounded-2xl p-5 shadow-2xs risk-pulse';
+      else if (riskPct > 25) riskCard.className = 'bg-amber-50/60 border-2 border-amber-200 rounded-2xl p-5 shadow-2xs';
+      else riskCard.className = 'bg-emerald-50/60 border-2 border-emerald-200 rounded-2xl p-5 shadow-2xs';
+
+      // Explanation
+      explanationText.innerHTML = `
+        Your blood sugar spiked to <strong>${ppg} mg/dL</strong> after meals${fpg >= 126 ? ` and your fasting level is <strong>${fpg} mg/dL</strong> (above normal)` : ''}.
+        ${hba1c >= 7.5 ? `Your HbA1c of <strong>${hba1c}%</strong> indicates poor long-term glucose control. ` : ''}
+        High sugar spikes weaken tiny blood vessels in the back of your eye over time,
+        which can lead to vision loss if not checked early.
+      `;
+
+      // Recommended action
+      recommendedAction.textContent = cat.action;
+
+      // Factors
+      factorsList.innerHTML = factors.map(f => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="material-symbols-outlined text-[18px] text-retisync-blue">${f.icon}</span>
+            <span class="text-[12.5px] text-slate-800 font-medium">${f.label}</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${f.sClass}">${f.severity}</span>
+        </div>
+      `).join('');
+
+      // Save reading
+      const now = new Date();
+      const timeStr = now.toLocaleDateString('en-IN', { day:'numeric', month:'short' }) + ', ' + now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+      savedReadings.push({ fpg, ppg, hba1c, dur, risk: riskPct, time: timeStr });
+      localStorage.setItem('retisync_readings', JSON.stringify(savedReadings));
+      renderReadings();
+
+      showToast('Risk Assessed', `${riskPct}% retinopathy risk calculated & logged.`);
+    });
+
+    // ============ AUDIO GUIDE ============
+    let isSpeaking = false;
+    const audioBtn = document.getElementById('audioBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    audioBtn.addEventListener('click', () => {
+      if (!('speechSynthesis' in window)) return;
+      if (isSpeaking) { window.speechSynthesis.cancel(); isSpeaking = false; audioIcon.textContent = 'volume_up'; return; }
+      window.speechSynthesis.cancel();
+      const txt = "This is the Eye and Sugar Check screen. Enter your morning fasting sugar and post-meal sugar readings using the sliders. Then tap Check My Eye Risk to calculate your 3-month retinopathy risk score. The score tells you how likely high blood sugar is affecting your eyes.";
+      const u = new SpeechSynthesisUtterance(txt);
+      u.rate = 0.95;
+      u.onstart = () => { isSpeaking = true; audioIcon.textContent = 'graphic_eq'; };
+      u.onend = u.onerror = () => { isSpeaking = false; audioIcon.textContent = 'volume_up'; };
+      window.speechSynthesis.speak(u);
+    });
+
+    // ============ BOTTOM ACTIONS ============
+    document.getElementById('callAshaBtn').addEventListener('click', () => {
+      showToast('Calling Sandhya Didi', 'Connecting to +91 98765 43210...');
+      setTimeout(() => { window.location.href = 'tel:+919876543210'; }, 500);
+    });
+    document.getElementById('findClinicBtn').addEventListener('click', () => {
+      showToast('Finding Clinic', 'Nearest: Sub-Center 4, Bishnupur (1.2 km)');
+    });
+
+    // ============ TOAST ============
+    function showToast(title, msg) {
+      const t = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = msg;
+      t.classList.remove('hidden'); t.classList.add('flex');
+      setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 3500);
+    }
+
+    // ============ INIT ============
+    renderReadings();
+
+    // Restore patient name from session
+    try {
+      const u = JSON.parse(localStorage.getItem('retisync_user') || '{}');
+      if (u.name) {
+        document.getElementById('patientName').textContent = u.name;
+        const parts = u.name.split(' ');
+        document.getElementById('patientInitials').textContent = parts.map(p => p[0]).join('').toUpperCase().slice(0,2);
+      }
+    } catch(e){}
+  </script>
+</body>
+</html>
