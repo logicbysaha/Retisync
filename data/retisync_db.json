@@ -123,7 +123,7 @@
       "subCenter": "Bishnupur Sub-Center 4",
       "assignedAshaId": "asha-001",
       "mpin": "1234",
-      "currentRiskScore": 65,
+      "currentRiskScore": 57,
       "riskLevel": "Stage 1: Mild NPDR",
       "priority": "Priority 1",
       "glucoseHistory": [
@@ -252,8 +252,8 @@
       "subCenter": "Bishnupur Sub-Center 4, South 24 Parganas",
       "subCenterShort": "Sub-Center Kotda",
       "totalAssignedVillagers": 24,
-      "screenedToday": 17,
-      "pendingToday": 7,
+      "screenedToday": 18,
+      "pendingToday": 6,
       "avatar": "sandhya_avatar.jpg",
       "status": "Online & Geofenced"
     }
@@ -313,6 +313,29 @@
     }
   ],
   "screenings": [
+    {
+      "id": "scr-1791970382495",
+      "patientId": "pat-002",
+      "patientName": "Rabin Das",
+      "eyeScanned": "Both Eyes (OD & OS)",
+      "glucoseReading": 168,
+      "bloodPressure": "130/85 mmHg",
+      "drStage": "Stage 1: Mild NPDR",
+      "drStageCode": 1,
+      "confidence": 96.3,
+      "retinopathyRiskScore": 57,
+      "riskLevel": "Moderate Risk",
+      "macularEdemaRisk": "Low Risk",
+      "lesionsFound": [
+        "Isolated microaneurysms noted in posterior pole",
+        "No neovascularization or venous beading observed"
+      ],
+      "clinicalRecommendation": "Tight glycemic and blood pressure management. Follow-up digital retinal rescan in 6 months by ASHA worker.",
+      "urgency": "Priority",
+      "scannedAt": "2026-10-14T09:33:02.495Z",
+      "scannedBy": "Sandhya Rani Mondal (ASHA)",
+      "imageUrl": null
+    },
     {
       "id": "scr-1791960146783",
       "patientId": "pat-002",

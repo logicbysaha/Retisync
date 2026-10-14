@@ -13,6 +13,7 @@ const campRoutes = require('./routes/camps');
 const ashaRoutes = require('./routes/asha');
 const syncRoutes = require('./routes/sync');
 const telehealthRoutes = require('./routes/telehealth');
+const ultralyticsRoutes = require('./routes/ultralytics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,6 +38,7 @@ app.use('/api/camps', campRoutes);
 app.use('/api/asha', ashaRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/telehealth', telehealthRoutes);
+app.use('/api/ultralytics', ultralyticsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
