@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="mobile_tab" name="shell-type"/>
+  <title>Retisync | Drishti Care Portal Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "palette-ice": "#e6f0fa",
+            "palette-ice-light": "#f8fafc",
+            "palette-slate": "#93b4cf",
+            "palette-slate-border": "#cbd5e1",
+            "palette-cobalt": "#0a58ca",
+            "palette-cobalt-hover": "#0849a6",
+            "palette-navy": "#061026",
+            "palette-navy-muted": "#1a2a46",
+            "surface": "#f1f5f9",
+            "surface-card": "#ffffff",
+          },
+          fontFamily: {
+            "sans": ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+            "bengali": ["'Noto Sans Bengali'", "'Inter'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        background-color: #eef2f7;
+      }
+      body {
+        overscroll-behavior-y: none;
+      }
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    /* Animated Toast Notification */
+    .toast-anim {
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideDown {
+      from { transform: translate(-50%, -100%); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    /* Pulse wave for voice */
+    .voice-pulse {
+      animation: wave 1.2s infinite ease-in-out;
+    }
+    @keyframes wave {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-[#eef2f7] text-palette-navy font-sans antialiased flex flex-col min-h-screen selection:bg-palette-cobalt selection:text-white">
+
+  <!-- Interactive Toast Notification -->
+  <div id="toastNotification" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-[92%] px-4 py-3 rounded-2xl bg-palette-navy text-white shadow-2xl border border-palette-slate/40 items-center gap-3 toast-anim">
+    <div id="toastIcon" class="w-8 h-8 rounded-full bg-palette-cobalt flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[18px]">info</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div id="toastTitle" class="text-[13px] font-bold leading-tight">Notification</div>
+      <div id="toastMessage" class="text-[11.5px] text-palette-slate leading-tight mt-0.5">Operation update</div>
+    </div>
+  </div>
+
+  <!-- Top Global Header (Grounded Navbar) -->
+  <header class="bg-palette-navy border-b border-[#142646] shadow-sm sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 h-15 flex items-center justify-between">
+      <a href="../index.html" class="flex items-center gap-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-palette-cobalt flex items-center justify-center text-white shadow-sm ring-1 ring-white/20 group-hover:bg-palette-cobalt-hover transition-colors">
+          <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-[17px] text-white tracking-tight leading-none">Retisync</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ONLINE</span>
+          </div>
+          <span class="text-[11px] font-medium text-palette-slate block mt-0.5">Drishti Care • Rural Eye Health Portal</span>
+        </div>
+      </a>
+
+      <!-- Language Selector -->
+      <div class="relative">
+        <button id="langMenuBtn" aria-label="Switch Language" class="h-9 px-3.5 rounded-full bg-[#13223f] border border-palette-slate/40 text-palette-ice flex items-center gap-1.5 focus:outline-none hover:bg-palette-cobalt transition-colors" type="button">
+          <span class="material-symbols-outlined text-[16px] text-palette-slate">translate</span>
+          <span id="currentLangLabel" class="font-medium text-[13px]">English</span>
+          <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="langDropdown" class="hidden absolute right-0 mt-2 w-44 bg-palette-navy border border-palette-slate/40 rounded-xl shadow-xl py-1.5 z-50">
+          <button class="lang-opt w-full px-3.5 py-2 text-left text-[13px] flex items-center justify-between text-white hover:bg-palette-cobalt/30 transition-colors" data-lang="en">
+            <span>English</span>
+            <span class="text-palette-slate text-[11px]">Default</span>
+          </button>
+          <button class="lang-opt w-full px-3.5 py-2 text-left text-[13px] flex items-center justify-between text-white hover:bg-palette-cobalt/30 transition-colors font-bengali" data-lang="bn">
+            <span>বাংলা (Bengali)</span>
+            <span class="text-palette-slate text-[11px]">Primary</span>
+          </button>
+          <button class="lang-opt w-full px-3.5 py-2 text-left text-[13px] flex items-center justify-between text-white hover:bg-palette-cobalt/30 transition-colors" data-lang="hi">
+            <span>हिंदी (Hindi)</span>
+            <span class="text-palette-slate text-[11px]">Standard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grounded Shell: Responsive Split-Layout on Desktop, Unified Seamless Flow on Mobile -->
+  <main class="flex-1 flex items-center justify-center p-3 sm:p-6 lg:p-10 w-full">
+    <div class="w-full max-w-5xl bg-white rounded-2xl md:rounded-3xl shadow-xl border border-slate-200/90 overflow-hidden flex flex-col md:flex-row">
+
+      <!-- LEFT COLUMN: Brand Showcase & Health Center Mission (Grounded Anchor Panel) -->
+      <div class="md:w-5/12 bg-gradient-to-br from-[#061026] via-[#091b3f] to-[#0a48a3] p-6 sm:p-8 flex flex-col justify-between text-white border-b md:border-b-0 md:border-r border-[#142646]">
+        <div>
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-palette-cobalt/40 border border-palette-slate/40 text-palette-ice text-[11.5px] font-semibold mb-4">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            National Rural Health Mission (NRHM)
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2 leading-tight">
+            Diabetic Retinopathy &amp; Glycemic Triage
+          </h1>
+          <p class="text-palette-slate text-sm leading-relaxed mb-6">
+            Empowering village patients and certified ASHA community workers with AI-assisted retina scans, instant blood sugar logs, and verified ABHA healthcare records.
+          </p>
+
+          <!-- Core Clinical Pillars (Grounded in Left Panel) -->
+          <div class="space-y-3.5 border-t border-white/10 pt-5">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 text-palette-slate">
+                <span class="material-symbols-outlined text-[19px]">verified_user</span>
+              </div>
+              <div>
+                <div class="text-[13px] font-bold text-white leading-tight">Private &amp; Secure Health Vault</div>
+                <div class="text-[11.5px] text-palette-slate leading-snug mt-0.5">Encrypted records accessible only to you and your assigned village ASHA Didi.</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 text-palette-slate">
+                <span class="material-symbols-outlined text-[19px]">wifi_tethering_off</span>
+              </div>
+              <div>
+                <div class="text-[13px] font-bold text-white leading-tight">Offline &amp; 2G Resilient</div>
+                <div class="text-[11.5px] text-palette-slate leading-snug mt-0.5">Built for remote clinics with offline storage and auto-sync when network resumes.</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 text-palette-slate">
+                <span class="material-symbols-outlined text-[19px]">record_voice_over</span>
+              </div>
+              <div>
+                <div class="text-[13px] font-bold text-white leading-tight">Bilingual Voice Guidance</div>
+                <div class="text-[11.5px] text-palette-slate leading-snug mt-0.5">Full speech assistance in Bengali (বাংলা) and English for accessible triage.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Left Panel Footer: Audio Guidance Trigger & Demo Shortcuts -->
+        <div class="pt-6 mt-6 border-t border-white/10 flex flex-col gap-3">
+          <!-- Voice Audio Banner -->
+          <button id="voiceBtn" type="button" class="w-full p-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 flex items-center justify-between text-left transition-all active:scale-[0.99] group cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-palette-cobalt text-white flex items-center justify-center shrink-0 shadow-sm">
+                <span id="voiceIcon" class="material-symbols-outlined text-[20px]">volume_up</span>
+              </div>
+              <div class="min-w-0">
+                <div id="voiceBtnTitle" class="text-[12.5px] font-bold text-white leading-tight">Listen to Voice Guide</div>
+                <div id="voiceBtnSubtitle" class="text-[11px] text-palette-slate leading-tight mt-0.5">English &amp; Bengali (বাংলা)</div>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-[20px] text-palette-slate group-hover:text-white transition-colors">play_circle</span>
+          </button>
+
+          <!-- Quick Test Presets -->
+          <div class="flex items-center justify-between pt-1 text-[11.5px] text-palette-slate">
+            <span class="font-semibold">Quick Testing:</span>
+            <div class="flex items-center gap-2">
+              <button id="quickFillPatient" type="button" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px] border border-white/20 transition-all cursor-pointer">
+                + Demo Patient
+              </button>
+              <button id="quickFillAsha" type="button" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px] border border-white/20 transition-all cursor-pointer">
+                + Demo ASHA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Grounded Unified Authentication Form -->
+      <div class="md:w-7/12 p-6 sm:p-8 flex flex-col justify-between bg-white">
+        <div>
+          <!-- Role Switcher (Integrated Segmented Bar - NOT floating) -->
+          <div class="mb-5">
+            <div class="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">Select Access Portal</div>
+            <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+              <button id="tabPatient" type="button" class="py-2.5 px-3 rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-2 transition-all cursor-pointer bg-white text-palette-cobalt shadow-xs border border-slate-200/60">
+                <span class="material-symbols-outlined text-[18px]">favorite</span>
+                <span>Villager / Patient</span>
+              </button>
+              <button id="tabAsha" type="button" class="py-2.5 px-3 rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-2 transition-all cursor-pointer text-slate-600 hover:text-slate-900">
+                <span class="material-symbols-outlined text-[18px]">badge</span>
+                <span>ASHA Worker</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ================= PATIENT FORM ================= -->
+          <form id="patientFormContainer" class="flex flex-col gap-4" onsubmit="return false;">
+            <!-- Demographics Section -->
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col gap-3.5">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-200/70">
+                <div class="font-bold text-[14px] text-palette-navy flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px] text-palette-cobalt">person</span>
+                  <span>Villager Demographics</span>
+                </div>
+                <span class="text-[11px] font-semibold text-palette-cobalt bg-palette-ice px-2 py-0.5 rounded-full border border-palette-slate/40">Step 1 of 2</span>
+              </div>
+
+              <!-- Name -->
+              <div>
+                <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="patientName">
+                  Full Name (as per Aadhaar / Voter ID) <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input id="patientName" type="text" value="Rajesh Sharma" placeholder="Enter full name" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20 transition-all placeholder:text-slate-400" required/>
+                  <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-[19px]">badge</span>
+                </div>
+              </div>
+
+              <!-- Age, Gender, Vitals Grid -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="patientAge">Age (Years)</label>
+                  <input id="patientAge" type="number" value="54" min="1" max="120" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" required/>
+                </div>
+                <div>
+                  <label class="block text-[12.5px] font-bold text-slate-700 mb-1">Gender</label>
+                  <div class="grid grid-cols-3 gap-1 h-11 p-1 bg-slate-200/70 rounded-lg">
+                    <button type="button" class="gender-btn rounded bg-palette-cobalt text-white font-bold text-[12.5px] flex items-center justify-center transition-colors shadow-2xs" data-gender="M">M</button>
+                    <button type="button" class="gender-btn rounded bg-transparent text-slate-700 font-bold text-[12.5px] flex items-center justify-center transition-colors hover:bg-white" data-gender="F">F</button>
+                    <button type="button" class="gender-btn rounded bg-transparent text-slate-700 font-bold text-[12.5px] flex items-center justify-center transition-colors hover:bg-white" data-gender="Oth">Oth</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="patientHeight">Height</label>
+                  <input id="patientHeight" type="text" value="168 cm" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20"/>
+                </div>
+                <div>
+                  <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="patientWeight">Weight</label>
+                  <input id="patientWeight" type="text" value="62 kg" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- Verification & Security Section -->
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col gap-3.5">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-200/70">
+                <div class="font-bold text-[14px] text-palette-navy flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px] text-palette-cobalt">security</span>
+                  <span>Mobile OTP &amp; Security mPIN</span>
+                </div>
+                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Instant Verification</span>
+              </div>
+
+              <!-- Phone + Resend -->
+              <div>
+                <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="patientPhone">Mobile Number (Aadhaar Linked)</label>
+                <div class="flex gap-2">
+                  <div class="flex-1 relative">
+                    <input id="patientPhone" type="tel" value="+91 98765 43210" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium tracking-wide outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" required/>
+                  </div>
+                  <button id="otpSendBtn" type="button" class="h-11 px-3.5 rounded-lg bg-slate-200/80 hover:bg-palette-cobalt hover:text-white text-slate-700 font-bold text-[12.5px] transition-all cursor-pointer shrink-0">
+                    Resend Code
+                  </button>
+                </div>
+              </div>
+
+              <!-- OTP Boxes -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-[12px] font-bold text-slate-600">Enter 4-Digit OTP Code</span>
+                  <span id="otpTimerLabel" class="text-[11.5px] font-bold text-palette-cobalt">Resend in 24s</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2.5">
+                  <input class="otp-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="text" value="7"/>
+                  <input class="otp-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="text" value="2"/>
+                  <input class="otp-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="text" value="8"/>
+                  <input class="otp-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="text" value="4"/>
+                </div>
+              </div>
+
+              <!-- 4-Digit mPIN -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-[12px] font-bold text-slate-600">4-Digit Security mPIN (Village Camp Key)</span>
+                  <span class="text-[11px] text-slate-400">Lock records</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2.5">
+                  <input class="mpin-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="password" value="4"/>
+                  <input class="mpin-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="password" value="9"/>
+                  <input class="mpin-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="password" value="2"/>
+                  <input class="mpin-box h-12 rounded-lg bg-white border-2 border-slate-300 text-center font-bold text-xl text-palette-navy outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" maxlength="1" inputmode="numeric" type="password" value="1"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit CTA -->
+            <button id="patientSubmitBtn" type="button" class="w-full h-13 rounded-xl bg-palette-cobalt hover:bg-palette-cobalt-hover text-white font-bold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-palette-cobalt/25 active:scale-[0.99] transition-all cursor-pointer">
+              <span id="patientBtnText">Verify &amp; Enter Patient Portal</span>
+              <span id="patientBtnIcon" class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+          </form>
+
+          <!-- ================= ASHA WORKER FORM ================= -->
+          <form id="ashaFormContainer" class="hidden flex-col gap-4" onsubmit="return false;">
+            <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col gap-3.5">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-200/70">
+                <div class="font-bold text-[14px] text-palette-navy flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px] text-palette-cobalt">badge</span>
+                  <span>ASHA Worker Official Accreditation</span>
+                </div>
+                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Govt Authorized</span>
+              </div>
+
+              <!-- Worker Full Name -->
+              <div>
+                <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="ashaName">ASHA Worker Full Name</label>
+                <div class="relative">
+                  <input id="ashaName" type="text" value="Sandhya Rani Mondal" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" required/>
+                  <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-[19px]">account_circle</span>
+                </div>
+              </div>
+
+              <!-- ASHA ID -->
+              <div>
+                <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="ashaId">Government ASHA Official ID</label>
+                <div class="relative">
+                  <input id="ashaId" type="text" value="WB-ASHA-884210" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium uppercase tracking-wider outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" required/>
+                  <span class="material-symbols-outlined absolute right-3 top-2.5 text-emerald-600 text-[19px]">verified</span>
+                </div>
+              </div>
+
+              <!-- Sub-Center -->
+              <div>
+                <label class="block text-[12.5px] font-bold text-slate-700 mb-1" for="ashaCenter">Assigned Sub-Center / Block</label>
+                <div class="relative">
+                  <input id="ashaCenter" type="text" value="Bishnupur Sub-Center 4, South 24 Parganas" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" required/>
+                  <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-[19px]">domain</span>
+                </div>
+                <div class="text-[11.5px] text-palette-cobalt font-semibold mt-1 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">my_location</span>
+                  BPHC Geo-Fence Verified (within 2.4 km)
+                </div>
+              </div>
+
+              <!-- Passcode -->
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-[12.5px] font-bold text-slate-700" for="ashaPass">Portal Passcode</label>
+                  <button id="togglePassBtn" type="button" class="text-[12px] font-bold text-palette-cobalt hover:underline flex items-center gap-1 cursor-pointer">
+                    <span id="passEyeIcon" class="material-symbols-outlined text-[15px]">visibility</span>
+                    <span id="passEyeText">Show</span>
+                  </button>
+                </div>
+                <input id="ashaPass" type="password" value="Kolkata@2025#" class="w-full h-11 px-3.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-[14px] font-medium outline-none focus:border-palette-cobalt focus:ring-2 focus:ring-palette-cobalt/20" required/>
+              </div>
+
+              <!-- Hardware Device Status -->
+              <div class="p-3 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-md bg-palette-cobalt/10 text-palette-cobalt flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[18px]">fingerprint</span>
+                  </div>
+                  <div>
+                    <div class="text-[12.5px] font-bold text-slate-800">Device Authenticated</div>
+                    <div class="text-[11px] text-slate-500">Govt Health Tab / Moto G54 (Registered)</div>
+                  </div>
+                </div>
+                <span class="material-symbols-outlined text-emerald-600 text-[20px]">check_circle</span>
+              </div>
+            </div>
+
+            <!-- Submit CTA -->
+            <button id="ashaSubmitBtn" type="button" class="w-full h-13 rounded-xl bg-palette-cobalt hover:bg-palette-cobalt-hover text-white font-bold text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-palette-cobalt/25 active:scale-[0.99] transition-all cursor-pointer">
+              <span id="ashaBtnIcon" class="material-symbols-outlined text-[20px]">login</span>
+              <span id="ashaBtnText">Log In to ASHA Field Portal</span>
+            </button>
+
+            <!-- Support Hotline -->
+            <div class="text-center pt-1">
+              <button id="bphcHelpBtn" type="button" class="text-[12.5px] font-semibold text-palette-cobalt hover:underline inline-flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[15px]">call</span>
+                Forgot ID or Sub-Center issue? Call BPHC Support
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right Column Footer (Grounded Trust Indicator) -->
+        <div class="pt-4 mt-4 border-t border-slate-200 flex items-center justify-between text-[11.5px] text-slate-500">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Offline Sync Active</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-palette-cobalt">security</span>
+            <span>256-Bit Health Vault</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      const tabPatient = document.getElementById('tabPatient');
+      const tabAsha = document.getElementById('tabAsha');
+      const patientForm = document.getElementById('patientFormContainer');
+      const ashaForm = document.getElementById('ashaFormContainer');
+      const voiceBtn = document.getElementById('voiceBtn');
+      const voiceIcon = document.getElementById('voiceIcon');
+      const voiceBtnTitle = document.getElementById('voiceBtnTitle');
+      const voiceBtnSubtitle = document.getElementById('voiceBtnSubtitle');
+      const togglePassBtn = document.getElementById('togglePassBtn');
+      const passInput = document.getElementById('ashaPass');
+      const passEyeIcon = document.getElementById('passEyeIcon');
+      const passEyeText = document.getElementById('passEyeText');
+      const genderBtns = document.querySelectorAll('.gender-btn');
+      const patientSubmitBtn = document.getElementById('patientSubmitBtn');
+      const ashaSubmitBtn = document.getElementById('ashaSubmitBtn');
+      const otpSendBtn = document.getElementById('otpSendBtn');
+      const otpTimerLabel = document.getElementById('otpTimerLabel');
+      const langMenuBtn = document.getElementById('langMenuBtn');
+      const langDropdown = document.getElementById('langDropdown');
+      const currentLangLabel = document.getElementById('currentLangLabel');
+      const toastNotification = document.getElementById('toastNotification');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMessage = document.getElementById('toastMessage');
+      const quickFillPatient = document.getElementById('quickFillPatient');
+      const quickFillAsha = document.getElementById('quickFillAsha');
+      const bphcHelpBtn = document.getElementById('bphcHelpBtn');
+
+      let currentRole = 'patient';
+      let currentLanguage = 'en';
+      let isSpeaking = false;
+      let otpCountdown = 24;
+      let otpInterval = null;
+      let toastTimeout = null;
+
+      function showToast(title, message, isSuccess = true) {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTitle.textContent = title;
+        toastMessage.textContent = message;
+        const iconContainer = document.getElementById('toastIcon');
+        if (isSuccess) {
+          iconContainer.className = "w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shrink-0";
+          iconContainer.innerHTML = `<span class="material-symbols-outlined text-[18px]">check</span>`;
+        } else {
+          iconContainer.className = "w-8 h-8 rounded-full bg-palette-cobalt flex items-center justify-center shrink-0";
+          iconContainer.innerHTML = `<span class="material-symbols-outlined text-[18px]">info</span>`;
+        }
+
+        toastNotification.classList.remove('hidden');
+        toastNotification.classList.add('flex');
+
+        toastTimeout = setTimeout(() => {
+          toastNotification.classList.add('hidden');
+          toastNotification.classList.remove('flex');
+        }, 3500);
+      }
+
+      function setRole(role) {
+        currentRole = role;
+        if (role === 'patient') {
+          patientForm.classList.remove('hidden');
+          patientForm.classList.add('flex');
+          ashaForm.classList.add('hidden');
+          ashaForm.classList.remove('flex');
+
+          tabPatient.className = "py-2.5 px-3 rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-2 transition-all cursor-pointer bg-white text-palette-cobalt shadow-xs border border-slate-200/60";
+          tabAsha.className = "py-2.5 px-3 rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-2 transition-all cursor-pointer text-slate-600 hover:text-slate-900";
+
+          showToast("Portal Mode", "Switched to Villager / Patient Portal");
+        } else {
+          ashaForm.classList.remove('hidden');
+          ashaForm.classList.add('flex');
+          patientForm.classList.add('hidden');
+          patientForm.classList.remove('flex');
+
+          tabAsha.className = "py-2.5 px-3 rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-2 transition-all cursor-pointer bg-white text-palette-cobalt shadow-xs border border-slate-200/60";
+          tabPatient.className = "py-2.5 px-3 rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-2 transition-all cursor-pointer text-slate-600 hover:text-slate-900";
+
+          showToast("Portal Mode", "Switched to ASHA Worker Field Portal");
+        }
+      }
+
+      if (tabPatient && tabAsha) {
+        tabPatient.addEventListener('click', () => setRole('patient'));
+        tabAsha.addEventListener('click', () => setRole('asha'));
+      }
+
+      // Quick Fill presets
+      if (quickFillPatient) {
+        quickFillPatient.addEventListener('click', () => {
+          setRole('patient');
+          document.getElementById('patientName').value = "Rajesh Sharma";
+          document.getElementById('patientAge').value = "54";
+          document.getElementById('patientPhone').value = "+91 98765 43210";
+          const otpBoxes = document.querySelectorAll('.otp-box');
+          ['7', '2', '8', '4'].forEach((val, i) => { if (otpBoxes[i]) otpBoxes[i].value = val; });
+          const mpinBoxes = document.querySelectorAll('.mpin-box');
+          ['4', '9', '2', '1'].forEach((val, i) => { if (mpinBoxes[i]) mpinBoxes[i].value = val; });
+          showToast("Demo Credentials", "Rajesh Sharma (Patient) loaded");
+        });
+      }
+
+      if (quickFillAsha) {
+        quickFillAsha.addEventListener('click', () => {
+          setRole('asha');
+          document.getElementById('ashaName').value = "Sandhya Rani Mondal";
+          document.getElementById('ashaId').value = "WB-ASHA-884210";
+          document.getElementById('ashaCenter').value = "Bishnupur Sub-Center 4, South 24 Parganas";
+          document.getElementById('ashaPass').value = "Kolkata@2025#";
+          showToast("Demo Credentials", "Sandhya Rani (ASHA Worker) loaded");
+        });
+      }
+
+      // Language Switcher Logic
+      if (langMenuBtn && langDropdown) {
+        langMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          langDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', () => {
+          langDropdown.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.lang-opt').forEach(opt => {
+          opt.addEventListener('click', () => {
+            const lang = opt.getAttribute('data-lang');
+            currentLanguage = lang;
+            if (lang === 'bn') {
+              currentLangLabel.textContent = "বাংলা";
+              voiceBtnTitle.textContent = "অডিও নির্দেশিকা শুনুন";
+              voiceBtnSubtitle.textContent = "বাংলা ও ইংরেজি ভয়েস গাইড";
+              showToast("ভাষা পরিবর্তিত", "বাংলা ভাষা নির্বাচন করা হয়েছে");
+            } else if (lang === 'hi') {
+              currentLangLabel.textContent = "हिंदी";
+              voiceBtnTitle.textContent = "ऑडियो गाइड सुनें";
+              voiceBtnSubtitle.textContent = "हिंदी और अंग्रेजी गाइड";
+              showToast("भाषा बदली गई", "हिंदी भाषा चुनी गई");
+            } else {
+              currentLangLabel.textContent = "English";
+              voiceBtnTitle.textContent = "Listen to Voice Guide";
+              voiceBtnSubtitle.textContent = "English & Bengali (বাংলা)";
+              showToast("Language Set", "English selected");
+            }
+            langDropdown.classList.add('hidden');
+          });
+        });
+      }
+
+      // Voice Audio Speech Synthesis
+      function speakVoiceGuide() {
+        if (!('speechSynthesis' in window)) {
+          showToast("Voice Assist", "Speech synthesis not supported in this browser", false);
+          return;
+        }
+
+        if (isSpeaking) {
+          window.speechSynthesis.cancel();
+          isSpeaking = false;
+          voiceIcon.textContent = "volume_up";
+          voiceBtnTitle.textContent = currentLanguage === 'bn' ? "অডিও নির্দেশিকা শুনুন" : "Listen to Voice Guide";
+          return;
+        }
+
+        let phrase = "Welcome to Retisync Drishti Care. Please enter your name, mobile number and 4-digit OTP to access your eye care records.";
+        let langCode = 'en-US';
+
+        if (currentLanguage === 'bn') {
+          phrase = "রেটিসঙ্ক দৃষ্টি কেয়ারে স্বাগতম। চোখের স্বাস্থ্য রিপোর্ট দেখতে নিজের নাম ও ওটিপি নম্বর দিন।";
+          langCode = 'bn-IN';
+        } else if (currentLanguage === 'hi') {
+          phrase = "दृष्टि केयर में आपका स्वागत है। अपनी आँखों की रिपोर्ट देखने के लिए अपना नाम और ओटीপি दर्ज करें।";
+          langCode = 'hi-IN';
+        }
+
+        const utterance = new SpeechSynthesisUtterance(phrase);
+        utterance.lang = langCode;
+        utterance.rate = 0.95;
+
+        utterance.onstart = () => {
+          isSpeaking = true;
+          voiceIcon.textContent = "graphic_eq";
+          voiceBtnTitle.textContent = "Playing Audio...";
+        };
+        utterance.onend = () => {
+          isSpeaking = false;
+          voiceIcon.textContent = "volume_up";
+          voiceBtnTitle.textContent = currentLanguage === 'bn' ? "অডিও নির্দেশিকা শুনুন" : "Listen to Voice Guide";
+        };
+        utterance.onerror = () => {
+          isSpeaking = false;
+          voiceIcon.textContent = "volume_up";
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      if (voiceBtn) voiceBtn.addEventListener('click', speakVoiceGuide);
+
+      // OTP Timer and Resend
+      function startOtpTimer() {
+        if (otpInterval) clearInterval(otpInterval);
+        otpCountdown = 24;
+        otpTimerLabel.textContent = `Resend in ${otpCountdown}s`;
+        otpSendBtn.disabled = true;
+        otpSendBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        otpInterval = setInterval(() => {
+          otpCountdown--;
+          if (otpCountdown > 0) {
+            otpTimerLabel.textContent = `Resend in ${otpCountdown}s`;
+          } else {
+            clearInterval(otpInterval);
+            otpTimerLabel.textContent = "Ready to resend";
+            otpSendBtn.disabled = false;
+            otpSendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          }
+        }, 1000);
+      }
+
+      startOtpTimer();
+
+      if (otpSendBtn) {
+        otpSendBtn.addEventListener('click', () => {
+          if (otpCountdown > 0) return;
+          const phone = document.getElementById('patientPhone').value || "+91 98765 43210";
+          const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+          const otpBoxes = document.querySelectorAll('.otp-box');
+          randomOtp.split('').forEach((digit, i) => {
+            if (otpBoxes[i]) otpBoxes[i].value = digit;
+          });
+          showToast("OTP Resent", `New verification code ${randomOtp} sent to ${phone}`);
+          startOtpTimer();
+        });
+      }
+
+      // Password visibility toggle
+      if (togglePassBtn && passInput) {
+        togglePassBtn.addEventListener('click', () => {
+          if (passInput.type === 'password') {
+            passInput.type = 'text';
+            passEyeIcon.textContent = 'visibility_off';
+            passEyeText.textContent = 'Hide';
+          } else {
+            passInput.type = 'password';
+            passEyeIcon.textContent = 'visibility';
+            passEyeText.textContent = 'Show';
+          }
+        });
+      }
+
+      // Gender buttons toggle
+      genderBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          genderBtns.forEach(b => {
+            b.className = 'gender-btn rounded bg-transparent text-slate-700 font-bold text-[12.5px] flex items-center justify-center transition-colors hover:bg-white';
+          });
+          btn.className = 'gender-btn rounded bg-palette-cobalt text-white font-bold text-[12.5px] flex items-center justify-center transition-colors shadow-2xs';
+        });
+      });
+
+      // Auto-advance OTP boxes
+      const otpBoxes = document.querySelectorAll('.otp-box');
+      otpBoxes.forEach((box, index) => {
+        box.addEventListener('input', () => {
+          if (box.value.length >= 1 && index < otpBoxes.length - 1) {
+            otpBoxes[index + 1].focus();
+          }
+        });
+        box.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !box.value && index > 0) {
+            otpBoxes[index - 1].focus();
+          }
+        });
+      });
+
+      // Auto-advance mPIN boxes
+      const mpinBoxes = document.querySelectorAll('.mpin-box');
+      mpinBoxes.forEach((box, index) => {
+        box.addEventListener('input', () => {
+          if (box.value.length >= 1 && index < mpinBoxes.length - 1) {
+            mpinBoxes[index + 1].focus();
+          }
+        });
+        box.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !box.value && index > 0) {
+            mpinBoxes[index - 1].focus();
+          }
+        });
+      });
+
+      // BPHC Help button
+      if (bphcHelpBtn) {
+        bphcHelpBtn.addEventListener('click', () => {
+          showToast("BPHC Support Desk", "Dialing BPHC Toll-Free Support: 1800-11-4477");
+        });
+      }
+
+      // Patient Login Submission & Portal Redirect
+      if (patientSubmitBtn) {
+        patientSubmitBtn.addEventListener('click', () => {
+          const name = document.getElementById('patientName').value.trim();
+          const phone = document.getElementById('patientPhone').value.trim();
+
+          if (!name) {
+            showToast("Missing Field", "Please enter your full name", false);
+            document.getElementById('patientName').focus();
+            return;
+          }
+
+          let otp = '';
+          otpBoxes.forEach(b => otp += b.value);
+          if (otp.length < 4) {
+            showToast("OTP Incomplete", "Please enter the 4-digit verification OTP", false);
+            return;
+          }
+
+          patientSubmitBtn.disabled = true;
+          document.getElementById('patientBtnText').textContent = "Authenticating ABHA Vault...";
+          document.getElementById('patientBtnIcon').className = "material-symbols-outlined text-[20px] animate-spin";
+          document.getElementById('patientBtnIcon').textContent = "progress_activity";
+
+          try {
+            localStorage.setItem('retisync_user', JSON.stringify({
+              role: 'patient',
+              name: name,
+              phone: phone,
+              abhaId: '91-4820-1928',
+              village: 'Bishnupur Village',
+              loginTime: new Date().toISOString()
+            }));
+          } catch(e) {}
+
+          showToast("Verified", `Welcome back, ${name}! Opening Patient Home...`);
+
+          setTimeout(() => {
+            window.location.href = "02-patient-home.html";
+          }, 800);
+        });
+      }
+
+      // ASHA Worker Login Submission & Portal Redirect
+      if (ashaSubmitBtn) {
+        ashaSubmitBtn.addEventListener('click', () => {
+          const name = document.getElementById('ashaName').value.trim();
+          const id = document.getElementById('ashaId').value.trim();
+          const pass = document.getElementById('ashaPass').value.trim();
+
+          if (!id || !pass) {
+            showToast("Credentials Required", "Please enter ASHA ID and Passcode", false);
+            return;
+          }
+
+          ashaSubmitBtn.disabled = true;
+          document.getElementById('ashaBtnText').textContent = "Verifying BPHC Credentials...";
+          document.getElementById('ashaBtnIcon').className = "material-symbols-outlined text-[20px] animate-spin";
+          document.getElementById('ashaBtnIcon').textContent = "progress_activity";
+
+          try {
+            localStorage.setItem('retisync_user', JSON.stringify({
+              role: 'asha',
+              name: name || "Sandhya Rani Mondal",
+              ashaId: id,
+              subCenter: "Bishnupur Sub-Center 4",
+              loginTime: new Date().toISOString()
+            }));
+          } catch(e) {}
+
+          showToast("Authorized", `ASHA Didi verified. Entering Field Worker Portal...`);
+
+          setTimeout(() => {
+            window.location.href = "05-asha-field-worker-home.html";
+          }, 800);
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>

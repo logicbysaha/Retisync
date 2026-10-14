@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="mobile_tab" name="shell-type"/>
+  <title>Patient Home | Retisync Drishti Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "retisync-blue": "#0a58ca",
+            "retisync-blue-hover": "#0849a6",
+            "retisync-navy": "#061e47",
+            "retisync-ice": "#dbe9fe",
+            "retisync-ice-light": "#edf4fe",
+            "retisync-pill": "#cfe2ff",
+            "retisync-alert-red": "#c92a2a",
+            "retisync-pink": "#ffe8e8",
+            "retisync-peach": "#ffe3e3"
+          },
+          fontFamily: {
+            "sans": ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+            "serif": ["'DM Serif Display'", "Georgia", "serif"],
+            "bengali": ["'Noto Sans Bengali'", "'Inter'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        background-color: #0b1329;
+      }
+      body {
+        overscroll-behavior-y: none;
+      }
+      .pb-safe { padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem); }
+      .pt-safe { padding-top: max(env(safe-area-inset-top, 0px), 0.75rem); }
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    .toast-anim {
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideDown {
+      from { transform: translate(-50%, -100%); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-[#0b1329] text-slate-900 font-sans antialiased flex justify-center min-h-screen">
+
+  <!-- Interactive Toast Notification -->
+  <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] hidden max-w-sm w-[90%] px-4 py-3 rounded-2xl bg-[#061e47] text-white shadow-2xl border border-blue-400/30 items-center gap-3 toast-anim">
+    <div id="toastIcon" class="w-8 h-8 rounded-full bg-retisync-blue flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[18px]">check</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div id="toastTitle" class="text-[13px] font-bold leading-tight">Notification</div>
+      <div id="toastMessage" class="text-[11.5px] text-blue-200 leading-tight mt-0.5">Operation update</div>
+    </div>
+  </div>
+
+  <!-- GROUNDED APPLICATION FRAME (Exact match to screenshot) -->
+  <div class="w-full max-w-md bg-[#f6f9fc] min-h-screen shadow-2xl border-x border-slate-300/40 relative flex flex-col">
+
+    <!-- 1. Top Navigation Header -->
+    <header class="sticky top-0 inset-x-0 z-40 bg-white border-b border-slate-200/90 shadow-2xs pt-safe">
+      <div class="h-16 px-4 flex items-center justify-between">
+        <div class="flex flex-col min-w-0 pr-2">
+          <span class="text-[12px] font-medium text-slate-500 truncate flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-retisync-blue">location_on</span>
+            <span id="subCenterLabel">Sub-Center Kotda</span>
+          </span>
+          <h1 class="font-serif font-bold text-[22px] text-slate-900 tracking-tight leading-tight truncate">Patient Home</h1>
+        </div>
+        <div class="flex items-center gap-2.5 shrink-0">
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d9ebfc] border border-[#bedbfc] text-retisync-blue">
+            <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+            <span class="text-[11px] font-bold tracking-wide">Synced</span>
+          </div>
+          <div class="relative">
+            <button id="userMenuBtn" class="w-9 h-9 rounded-full bg-retisync-navy flex items-center justify-center text-white shadow-sm hover:bg-slate-800 transition-colors cursor-pointer" title="Account Menu">
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">person</span>
+            </button>
+            <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white border border-slate-200 rounded-xl shadow-xl py-1.5 z-50 text-slate-800">
+              <div class="px-3.5 py-1.5 border-b border-slate-100">
+                <div id="menuName" class="font-serif font-bold text-[14px] text-slate-900 truncate">Rajesh Sharma</div>
+                <div class="text-[11px] text-slate-500 font-mono">ABHA: 91-4820-1928</div>
+                <div class="text-[11px] text-emerald-600 font-medium">Bishnupur Sub-Center</div>
+              </div>
+              <a href="asha-home.html" class="flex items-center gap-2 px-3.5 py-2 text-[12.5px] text-retisync-blue hover:bg-blue-50 font-semibold transition-colors">
+                <span class="material-symbols-outlined text-[16px]">switch_account</span> Switch to ASHA Worker
+              </a>
+              <a href="login.html" class="flex items-center gap-2 px-3.5 py-2 text-[12.5px] text-red-600 hover:bg-red-50 font-medium transition-colors">
+                <span class="material-symbols-outlined text-[16px]">logout</span> Log Out / Switch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="flex-1 flex flex-col gap-3.5 p-4 pb-24">
+
+      <!-- 2. Audio Guidance Banner -->
+      <button id="audioGuidanceBtn" class="w-full bg-retisync-ice hover:bg-[#cde2fd] border border-[#bcd7fb] rounded-2xl p-4 flex items-center justify-between text-left transition-all active:scale-[0.99] shadow-2xs group cursor-pointer" type="button">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-retisync-blue text-white flex items-center justify-center shrink-0 shadow-sm">
+            <span id="audioIcon" class="material-symbols-outlined text-[22px]">volume_up</span>
+          </div>
+          <div>
+            <span id="audioTitle" class="font-serif font-bold text-[15.5px] text-slate-900 block leading-tight">Listen to this screen</span>
+            <span id="audioSubtitle" class="text-[12px] text-slate-600 block mt-0.5">Audio in English &amp; Bengali (বাংলা)</span>
+          </div>
+        </div>
+        <div class="w-9 h-9 rounded-full border-2 border-retisync-blue text-retisync-blue flex items-center justify-center shrink-0 group-hover:bg-retisync-blue group-hover:text-white transition-colors">
+          <span id="audioPlayIcon" class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+        </div>
+      </button>
+
+      <!-- 3. Welcome Back Card -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-4.5 shadow-2xs flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <span class="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Welcome back</span>
+          <h2 id="greetingHeading" class="font-serif font-bold text-[24px] text-slate-900 tracking-tight leading-tight">Hello, Rajesh</h2>
+          <div class="flex items-center gap-1.5 mt-1 text-[13px] text-slate-600 font-medium">
+            <span class="material-symbols-outlined text-[16px] text-retisync-blue" style="font-variation-settings: 'FILL' 1;">location_on</span>
+            <span id="villageText">Bishnupur Village</span>
+          </div>
+        </div>
+        <div class="bg-[#e8f1fc] border border-blue-200/80 px-3.5 py-1.5 rounded-2xl shrink-0 text-center">
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">ABHA ID</span>
+          <span class="text-[12.5px] font-bold text-slate-900 font-mono">91-4820-1928</span>
+        </div>
+      </div>
+
+      <!-- 4. Attention Needed Section -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col gap-3.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-full bg-retisync-alert-red inline-block"></span>
+            <h3 class="font-serif font-bold text-[19px] text-slate-900 leading-tight">Attention Needed</h3>
+          </div>
+          <span class="px-3 py-0.5 rounded-full bg-retisync-peach text-retisync-alert-red text-[11px] font-bold">Action Advised</span>
+        </div>
+
+        <!-- Metric 1: Blood Sugar -->
+        <div class="bg-slate-50/70 border border-slate-200/70 rounded-2xl p-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-retisync-pink text-retisync-alert-red flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[22px]">water_drop</span>
+            </div>
+            <div>
+              <div class="font-serif font-bold text-[14.5px] text-slate-900 leading-tight">Blood Sugar (Post-Meal)</div>
+              <div id="sugarLoggedTime" class="text-[11.5px] text-slate-500 mt-0.5">Checked 2 hours ago</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div id="sugarDisplay" class="font-serif font-bold text-[25px] text-retisync-alert-red leading-none">245</div>
+            <div class="text-[11px] font-bold text-retisync-alert-red mt-0.5">mg/dL • High</div>
+          </div>
+        </div>
+
+        <!-- Metric 2: Retinopathy Risk -->
+        <div class="bg-slate-50/70 border border-slate-200/70 rounded-2xl p-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-[#e1f0fe] text-retisync-blue flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[22px]">visibility</span>
+            </div>
+            <div>
+              <div class="font-serif font-bold text-[14.5px] text-slate-900 leading-tight">Retinopathy Risk</div>
+              <div class="text-[11.5px] text-slate-500 mt-0.5">Urgent Eye Check</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="font-serif font-bold text-[25px] text-retisync-blue leading-none">78%</div>
+            <div class="text-[11px] font-bold text-retisync-blue mt-0.5">Elevated</div>
+          </div>
+        </div>
+
+        <!-- Info callout box -->
+        <div class="bg-retisync-ice-light border border-blue-200/60 rounded-xl p-3.5 flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-[20px] text-retisync-blue shrink-0 mt-0.5">info</span>
+          <p class="text-[12.5px] text-slate-700 leading-relaxed font-normal">
+            High blood sugar can harm small blood vessels in your eyes. An eye photo scan is recommended this week.
+          </p>
+        </div>
+      </div>
+
+      <!-- 5. Two Quick Action Tiles -->
+      <div class="grid grid-cols-2 gap-3">
+        <button id="openLogSugarBtn" type="button" class="bg-white hover:bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-col items-start gap-2 text-left transition-all active:scale-[0.98] shadow-2xs group cursor-pointer">
+          <div class="w-11 h-11 rounded-full bg-[#dbeafe] text-retisync-blue flex items-center justify-center shrink-0 group-hover:bg-retisync-blue group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[22px]">water_drop</span>
+          </div>
+          <div>
+            <span class="font-serif font-bold text-[15px] text-slate-900 block leading-tight">Log Today's Sugar</span>
+            <span class="text-[11.5px] text-slate-500 block mt-0.5">Enter glucometer reading</span>
+          </div>
+        </button>
+
+        <button id="openEyeRiskBtn" type="button" class="bg-white hover:bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-col items-start gap-2 text-left transition-all active:scale-[0.98] shadow-2xs group cursor-pointer">
+          <div class="w-11 h-11 rounded-full bg-[#dbeafe] text-retisync-blue flex items-center justify-center shrink-0 group-hover:bg-retisync-blue group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[22px]">center_focus_strong</span>
+          </div>
+          <div>
+            <span class="font-serif font-bold text-[15px] text-slate-900 block leading-tight">Check Eye Risk</span>
+            <span class="text-[11.5px] text-slate-500 block mt-0.5">Learn about your eyes</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- 6. Assigned Health Worker Card (With Authentic Portrait) -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col gap-3.5">
+        <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Local Health Support</span>
+            <h3 class="font-serif font-bold text-[17px] text-slate-900">Your Assigned Health Worker</h3>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full bg-retisync-blue inline-block"></span>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200/70 rounded-2xl p-3 flex items-center gap-3">
+          <img src="sandhya_avatar.jpg" alt="Sandhya Didi ASHA Worker" class="w-14 h-14 rounded-full object-cover shrink-0 shadow-xs border border-slate-200"/>
+          <div class="min-w-0">
+            <div class="font-serif font-bold text-[16px] text-slate-900 leading-tight">Sandhya Didi</div>
+            <div class="text-[12px] text-slate-500 mt-0.5">ASHA Worker • Bishnupur</div>
+            <div class="text-[11.5px] text-retisync-blue font-medium flex items-center gap-1 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-retisync-blue"></span> Available in Bishnupur Sub-Center
+            </div>
+          </div>
+        </div>
+
+        <button id="callSandhyaBtn" type="button" class="w-full h-12 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[14px] flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[19px]">call</span>
+          <span>Call Sandhya Didi</span>
+        </button>
+
+        <button id="requestVisitBtn" type="button" class="w-full h-12 rounded-xl bg-retisync-pill hover:bg-[#bedbfc] text-retisync-blue font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.99] transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[19px]">location_on</span>
+          <span id="visitBtnText">Request Home Visit</span>
+        </button>
+      </div>
+
+      <!-- 7. Village Eye Camp Card -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-4.5 shadow-2xs flex flex-col gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-[#e1f0fe] text-retisync-blue flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[22px]">medical_services</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Village Clinic Update</span>
+            <h3 class="font-serif font-bold text-[16px] text-slate-900 leading-tight mt-0.5">Next Free Eye Camp</h3>
+            <p class="text-[12.5px] text-slate-600 mt-0.5">Thursday, 10 AM at Sub-Center 4</p>
+            <p class="text-[11.5px] text-slate-500 mt-1 leading-snug">Includes free digital retinal screening and doctor consultation</p>
+          </div>
+        </div>
+
+        <button id="bookCampSlotBtn" type="button" class="w-full h-12 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[14px] flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-all cursor-pointer mt-1">
+          <span class="material-symbols-outlined text-[19px]">calendar_month</span>
+          <span id="campBtnText">Book Free Slot</span>
+        </button>
+      </div>
+
+    </main>
+
+    <!-- 8. Bottom Anchored Navigation Bar -->
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-md pb-safe">
+      <div class="max-w-md mx-auto flex justify-around items-center h-16 px-2">
+        <a href="patient-home.html" class="flex flex-col items-center justify-center min-w-[56px] text-retisync-blue font-bold">
+          <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span>
+          <span class="text-[11px] mt-0.5">Home</span>
+        </a>
+        <button id="navQueueBtn" type="button" class="flex flex-col items-center justify-center min-w-[56px] text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[24px]">view_list</span>
+          <span class="text-[11px] mt-0.5">Queue</span>
+        </button>
+        <button id="navScanBtn" type="button" class="flex flex-col items-center justify-center min-w-[56px] text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[24px]">qr_code_scanner</span>
+          <span class="text-[11px] mt-0.5">Scan</span>
+        </button>
+        <button id="navProfileBtn" type="button" class="flex flex-col items-center justify-center min-w-[56px] text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer" title="View Profile">
+          <span class="material-symbols-outlined text-[24px]">account_circle</span>
+          <span class="text-[11px] mt-0.5">Profile</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- MODAL: Log Sugar Reading -->
+  <div id="logSugarModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-100 text-retisync-blue flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">water_drop</span>
+          </div>
+          <h3 class="font-serif font-bold text-[17px] text-slate-900">Log Blood Glucose</h3>
+        </div>
+        <button id="closeSugarModal" type="button" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div>
+          <label class="block text-[12px] font-bold text-slate-700 mb-1">Glucometer Reading</label>
+          <div class="relative">
+            <input id="sugarInput" type="number" value="142" placeholder="e.g. 140" class="w-full h-12 px-3.5 rounded-xl border border-slate-300 font-bold text-xl text-slate-900 outline-none focus:border-retisync-blue focus:ring-2 focus:ring-blue-500/20"/>
+            <span class="absolute right-3.5 top-3.5 text-xs text-slate-400 font-semibold">mg/dL</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[12px] font-bold text-slate-700 mb-1">Timing</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="meal-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-retisync-blue bg-blue-50 text-retisync-blue" data-val="Fasting">Fasting (Before food)</button>
+            <button type="button" class="meal-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-slate-200 bg-white text-slate-600 hover:bg-slate-50" data-val="Post-Meal">Post-Meal (After food)</button>
+          </div>
+        </div>
+      </div>
+
+      <button id="saveSugarBtn" type="button" class="w-full h-11 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[14px] transition-all cursor-pointer">
+        Save Reading to Health Vault
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Eye Risk Assessment -->
+  <div id="eyeRiskModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-100 text-retisync-blue flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">visibility</span>
+          </div>
+          <h3 class="font-serif font-bold text-[17px] text-slate-900">Retinopathy Risk Assessment</h3>
+        </div>
+        <button id="closeEyeRiskModal" type="button" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-2.5">
+        <span class="material-symbols-outlined text-amber-600 text-[20px] shrink-0 mt-0.5">warning</span>
+        <div class="text-[12px] text-amber-900 leading-relaxed">
+          <strong>Risk Level: 78% (Elevated)</strong><br/>
+          Your recent blood sugar levels (&gt;200 mg/dL) increase the microvascular pressure on retinal blood vessels.
+        </div>
+      </div>
+
+      <div class="space-y-2 text-[12.5px] text-slate-600">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
+          <span>Early symptoms may have zero vision blur.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
+          <span>Sandhya Didi has a smartphone retinal camera.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
+          <span>Screening takes less than 3 minutes, non-invasive.</span>
+        </div>
+      </div>
+
+      <button id="modalRequestVisitBtn" type="button" class="w-full h-11 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[14px] transition-all cursor-pointer">
+        Request Retinal Scan by Sandhya Didi
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Home Visit Request -->
+  <div id="homeVisitModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-100 text-retisync-blue flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">home</span>
+          </div>
+          <h3 class="font-serif font-bold text-[17px] text-slate-900">Request Home Visit</h3>
+        </div>
+        <button id="closeVisitModal" type="button" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="text-[12.5px] text-slate-600 leading-normal">
+        Sandhya Didi will visit your home in <strong>Bishnupur Village</strong> with the digital retinal camera and glucometer.
+      </div>
+
+      <div>
+        <label class="block text-[12px] font-bold text-slate-700 mb-1">Preferred Time</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" class="visit-time-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-retisync-blue bg-blue-50 text-retisync-blue" data-time="Morning (10 AM - 12 PM)">Morning (10 AM - 12 PM)</button>
+          <button type="button" class="visit-time-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-slate-200 bg-white text-slate-600 hover:bg-slate-50" data-time="Afternoon (3 PM - 5 PM)">Afternoon (3 PM - 5 PM)</button>
+        </div>
+      </div>
+
+      <button id="confirmVisitBtn" type="button" class="w-full h-11 rounded-xl bg-retisync-blue hover:bg-retisync-blue-hover text-white font-bold text-[14px] transition-all cursor-pointer">
+        Confirm Home Visit Request
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: Call Sandhya Didi -->
+  <div id="callModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 flex flex-col gap-4 text-center">
+      <img src="sandhya_avatar.jpg" alt="Sandhya Didi" class="w-16 h-16 rounded-full object-cover mx-auto shadow-md border-2 border-retisync-blue"/>
+      <div>
+        <h3 class="font-serif font-bold text-[18px] text-slate-900">Connect to Sandhya Didi</h3>
+        <p class="text-[12px] text-slate-500 mt-0.5">Bishnupur Sub-Center ASHA Worker</p>
+        <p class="font-mono font-bold text-lg text-retisync-blue mt-2">+91 98765 43210</p>
+      </div>
+
+      <div class="flex gap-2">
+        <a href="tel:+919876543210" class="flex-1 h-11 rounded-xl bg-retisync-blue text-white font-bold text-[14px] flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">call</span> Direct Call
+        </a>
+        <button id="closeCallModal" type="button" class="h-11 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-[13px]">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio synthesis for voice guidance
+    let isSpeaking = false;
+    const audioBtn = document.getElementById('audioGuidanceBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioPlayIcon = document.getElementById('audioPlayIcon');
+    const audioTitle = document.getElementById('audioTitle');
+
+    function speakScreen() {
+      if (!('speechSynthesis' in window)) {
+        showToast("Audio unavailable", "Speech synthesis is not supported on this browser.");
+        return;
+      }
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        audioIcon.textContent = 'volume_up';
+        audioPlayIcon.textContent = 'play_arrow';
+        audioTitle.textContent = 'Listen to this screen';
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const text = "Welcome back, Rajesh. Attention needed: your post-meal blood sugar is 245 milligrams per deciliter, which is high. Your retinopathy eye risk is 78 percent. An eye photo scan is recommended this week. You can tap Call Sandhya Didi or tap Book Free Slot for Thursday's Eye Camp at Sub Center 4.";
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      utterance.onstart = () => {
+        isSpeaking = true;
+        audioIcon.textContent = 'graphic_eq';
+        audioPlayIcon.textContent = 'stop';
+        audioTitle.textContent = 'Playing audio guide...';
+      };
+      utterance.onend = utterance.onerror = () => {
+        isSpeaking = false;
+        audioIcon.textContent = 'volume_up';
+        audioPlayIcon.textContent = 'play_arrow';
+        audioTitle.textContent = 'Listen to this screen';
+      };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    if (audioBtn) audioBtn.addEventListener('click', speakScreen);
+
+    // Toast helper
+    function showToast(title, msg) {
+      const toast = document.getElementById('toastNotification');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMsg = document.getElementById('toastMessage');
+      if (!toast) return;
+      toastTitle.textContent = title;
+      toastMsg.textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 3500);
+    }
+
+    // User Menu dropdown
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userMenuDropdown = document.getElementById('userMenuDropdown');
+    if (userMenuBtn && userMenuDropdown) {
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenuDropdown.classList.toggle('hidden');
+      });
+      document.addEventListener('click', () => {
+        userMenuDropdown.classList.add('hidden');
+      });
+    }
+
+    // Modals Handling
+    const logSugarModal = document.getElementById('logSugarModal');
+    const openLogSugarBtn = document.getElementById('openLogSugarBtn');
+    const closeSugarModal = document.getElementById('closeSugarModal');
+    const saveSugarBtn = document.getElementById('saveSugarBtn');
+    const sugarInput = document.getElementById('sugarInput');
+    const sugarDisplay = document.getElementById('sugarDisplay');
+    const sugarLoggedTime = document.getElementById('sugarLoggedTime');
+
+    if (openLogSugarBtn) openLogSugarBtn.addEventListener('click', () => {
+      logSugarModal.classList.remove('hidden');
+      logSugarModal.classList.add('flex');
+    });
+    if (closeSugarModal) closeSugarModal.addEventListener('click', () => {
+      logSugarModal.classList.add('hidden');
+      logSugarModal.classList.remove('flex');
+    });
+
+    // Timing selector in sugar modal
+    let selectedTiming = "Fasting";
+    document.querySelectorAll('.meal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.meal-btn').forEach(b => {
+          b.className = 'meal-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
+        });
+        btn.className = 'meal-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-retisync-blue bg-blue-50 text-retisync-blue';
+        selectedTiming = btn.getAttribute('data-val');
+      });
+    });
+
+    if (saveSugarBtn) {
+      saveSugarBtn.addEventListener('click', () => {
+        const val = sugarInput.value || 140;
+        sugarDisplay.textContent = val;
+        sugarLoggedTime.textContent = 'Just logged (' + selectedTiming + ')';
+        logSugarModal.classList.add('hidden');
+        logSugarModal.classList.remove('flex');
+        showToast("Glucose Logged", `${val} mg/dL saved to Retisync Health Vault.`);
+      });
+    }
+
+    // Eye Risk Modal
+    const eyeRiskModal = document.getElementById('eyeRiskModal');
+    const openEyeRiskBtn = document.getElementById('openEyeRiskBtn');
+    const closeEyeRiskModal = document.getElementById('closeEyeRiskModal');
+    const modalRequestVisitBtn = document.getElementById('modalRequestVisitBtn');
+
+    if (openEyeRiskBtn) openEyeRiskBtn.addEventListener('click', () => {
+      eyeRiskModal.classList.remove('hidden');
+      eyeRiskModal.classList.add('flex');
+    });
+    if (closeEyeRiskModal) closeEyeRiskModal.addEventListener('click', () => {
+      eyeRiskModal.classList.add('hidden');
+      eyeRiskModal.classList.remove('flex');
+    });
+
+    // Home Visit Modal
+    const homeVisitModal = document.getElementById('homeVisitModal');
+    const requestVisitBtn = document.getElementById('requestVisitBtn');
+    const closeVisitModal = document.getElementById('closeVisitModal');
+    const confirmVisitBtn = document.getElementById('confirmVisitBtn');
+    const visitBtnText = document.getElementById('visitBtnText');
+
+    if (requestVisitBtn) requestVisitBtn.addEventListener('click', () => {
+      homeVisitModal.classList.remove('hidden');
+      homeVisitModal.classList.add('flex');
+    });
+    if (closeVisitModal) closeVisitModal.addEventListener('click', () => {
+      homeVisitModal.classList.add('hidden');
+      homeVisitModal.classList.remove('flex');
+    });
+    if (modalRequestVisitBtn) modalRequestVisitBtn.addEventListener('click', () => {
+      eyeRiskModal.classList.add('hidden');
+      eyeRiskModal.classList.remove('flex');
+      homeVisitModal.classList.remove('hidden');
+      homeVisitModal.classList.add('flex');
+    });
+
+    let selectedVisitTime = "Morning (10 AM - 12 PM)";
+    document.querySelectorAll('.visit-time-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.visit-time-btn').forEach(b => {
+          b.className = 'visit-time-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
+        });
+        btn.className = 'visit-time-btn py-2 px-3 rounded-lg border text-xs font-bold transition-all border-retisync-blue bg-blue-50 text-retisync-blue';
+        selectedVisitTime = btn.getAttribute('data-time');
+      });
+    });
+
+    if (confirmVisitBtn) {
+      confirmVisitBtn.addEventListener('click', () => {
+        homeVisitModal.classList.add('hidden');
+        homeVisitModal.classList.remove('flex');
+        visitBtnText.textContent = `Visit Requested (${selectedVisitTime})`;
+        showToast("Visit Requested", `Sandhya Didi notified for ${selectedVisitTime}.`);
+      });
+    }
+
+    // Call Sandhya Didi Modal
+    const callModal = document.getElementById('callModal');
+    const callSandhyaBtn = document.getElementById('callSandhyaBtn');
+    const closeCallModal = document.getElementById('closeCallModal');
+
+    if (callSandhyaBtn) callSandhyaBtn.addEventListener('click', () => {
+      callModal.classList.remove('hidden');
+      callModal.classList.add('flex');
+    });
+    if (closeCallModal) closeCallModal.addEventListener('click', () => {
+      callModal.classList.add('hidden');
+      callModal.classList.remove('flex');
+    });
+
+    // Book Free Slot
+    const bookCampSlotBtn = document.getElementById('bookCampSlotBtn');
+    const campBtnText = document.getElementById('campBtnText');
+    if (bookCampSlotBtn) {
+      bookCampSlotBtn.addEventListener('click', () => {
+        campBtnText.textContent = "Slot Confirmed (Token #KOT-14)";
+        bookCampSlotBtn.classList.remove('bg-retisync-blue', 'hover:bg-retisync-blue-hover');
+        bookCampSlotBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        showToast("Eye Camp Slot Booked", "Token #KOT-14 for Thursday 10 AM confirmed.");
+      });
+    }
+
+    // Bottom Navigation Buttons
+    const navQueueBtn = document.getElementById('navQueueBtn');
+    const navScanBtn = document.getElementById('navScanBtn');
+    const navProfileBtn = document.getElementById('navProfileBtn');
+
+    if (navQueueBtn) navQueueBtn.addEventListener('click', () => {
+      showToast("Eye Camp Queue", "Your spot is Token #KOT-14 for Sub-Center 4.");
+    });
+    if (navScanBtn) navScanBtn.addEventListener('click', () => {
+      eyeRiskModal.classList.remove('hidden');
+      eyeRiskModal.classList.add('flex');
+    });
+    if (navProfileBtn) navProfileBtn.addEventListener('click', () => {
+      userMenuDropdown.classList.toggle('hidden');
+    });
+
+    // Restore session data from dual login
+    try {
+      const savedUser = localStorage.getItem('retisync_user');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (u.name) {
+          document.getElementById('greetingHeading').textContent = `Hello, ${u.name}`;
+          document.getElementById('menuName').textContent = u.name;
+        }
+        if (u.village) {
+          document.getElementById('villageText').textContent = u.village;
+          document.getElementById('subCenterLabel').textContent = `Sub-Center ${u.village}`;
+        }
+      }
+    } catch(e) {}
+  </script>
+</body>
+</html>

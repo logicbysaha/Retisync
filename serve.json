@@ -1,0 +1,13 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/patient", "destination": "/patient-home.html" },
+    { "source": "/patient-home", "destination": "/patient-home.html" },
+    { "source": "/asha", "destination": "/asha-home.html" },
+    { "source": "/asha-home", "destination": "/asha-home.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/screens/02-patient-home", "destination": "/screens/02-patient-home.html" },
+    { "source": "/screens/05-asha-field-worker-home", "destination": "/screens/05-asha-field-worker-home.html" },
+    { "source": "/screens/01-asha-patient-dual-login", "destination": "/screens/01-asha-patient-dual-login.html" }
+  ]
+}

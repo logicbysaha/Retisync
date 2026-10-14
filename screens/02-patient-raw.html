@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><title>Patient Home</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "palette-ice": "#eef5fc", "palette-ice-subtle": "#f4f8fd", "palette-ice-container": "#dbe8f6", "palette-slate": "#93b4cf", "palette-slate-border": "#b0c8de", "palette-cobalt": "#0a58ca", "palette-cobalt-hover": "#0849a6", "palette-navy": "#061026", "palette-navy-muted": "#1a2a46", "palette-navy-text": "#08142b", "error": "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" }, spacing: { "margin-mobile": "1rem", "space-xs": "0.375rem", "gutter": "1rem", "space-md": "1rem", "space-sm": "0.75rem", "margin": "1.5rem", "gutter-mobile": "0.75rem", "space-lg": "1.5rem", "space-xl": "2.25rem" }, fontFamily: { "headline-sm": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "headline-xl-mobile": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif\"" ], "body-md": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "label-md": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "label-lg": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "body-sm": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "headline-lg-mobile": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif\"" ], "headline-md": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif\"" ], "label-sm": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "body-lg": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif\"" ], "headline-xl": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif\"" ], "headline-lg": [ "\"-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif\"" ] }, fontSize: { "headline-sm": [ "17px", { "lineHeight": "24px", "fontWeight": "600" } ], "headline-xl-mobile": [ "28px", { "lineHeight": "36px", "fontWeight": "700" } ], "body-md": [ "16px", { "lineHeight": "24px", "fontWeight": "400" } ], "label-md": [ "14px", { "lineHeight": "18px", "fontWeight": "600" } ], "label-lg": [ "16px", { "lineHeight": "22px", "fontWeight": "600" } ], "body-sm": [ "14px", { "lineHeight": "20px", "fontWeight": "400" } ], "headline-lg-mobile": [ "22px", { "lineHeight": "30px", "fontWeight": "600" } ], "headline-md": [ "20px", { "lineHeight": "28px", "fontWeight": "600" } ], "label-sm": [ "12px", { "lineHeight": "16px", "fontWeight": "500" } ], "body-lg": [ "18px", { "lineHeight": "26px", "fontWeight": "400" } ], "headline-xl": [ "36px", { "lineHeight": "44px", "fontWeight": "700" } ], "headline-lg": [ "28px", { "lineHeight": "36px", "fontWeight": "600" } ] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-palette-ice font-body-md text-body-md text-palette-navy-text antialiased flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-[#08142b] border-b border-[#142646] shadow-md pt-safe"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex flex-col min-w-0 pr-space-xs"><span class="font-label-sm text-label-sm text-palette-slate truncate flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-palette-slate">location_on</span>Sub-Center Kotda</span><h1 class="font-headline-sm text-headline-sm text-white truncate">Patient Home</h1></div><div class="flex items-center gap-space-sm flex-shrink-0"><div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#13223f] border border-palette-slate/40 text-palette-ice"><span class="material-symbols-outlined text-[14px] text-palette-slate" style="font-variation-settings: 'FILL' 1;">cloud_done</span><span class="font-label-sm text-label-sm font-semibold text-palette-ice">Synced</span></div><div class="w-9 h-9 rounded-full bg-palette-cobalt ring-1 ring-palette-slate/40 flex items-center justify-center text-white shadow-sm"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full px-gutter pt-20 pb-24 bg-palette-ice"><div class="flex flex-col w-full pb-8">
+<!-- Audio Companion & Reassurance Banner -->
+<div class="mb-4">
+<button aria-label="Listen to this page in your language" class="w-full bg-white border border-palette-slate-border rounded-2xl p-4 flex items-center justify-between shadow-xs active:scale-[0.99] transition-transform text-left" id="audioGuidanceBtn">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-palette-cobalt text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+</div>
+<div>
+<span class="font-label-md text-label-md block text-palette-navy-text">Listen to this screen</span>
+<span class="font-body-sm text-body-sm text-palette-navy-text/70">Audio in English &amp; Bengali (বাংলা)</span>
+</div>
+</div>
+<div class="w-9 h-9 rounded-full bg-palette-ice border border-palette-slate/40 flex items-center justify-center text-palette-cobalt">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+</button>
+</div>
+<!-- Patient Greeting & ABHA Summary -->
+<div class="bg-white border border-palette-slate-border rounded-2xl p-5 mb-5 shadow-xs">
+<div class="flex items-start justify-between gap-3">
+<div class="min-w-0">
+<span class="font-label-sm text-label-sm text-palette-navy-text/70 uppercase tracking-wider block mb-0.5 font-bold">Welcome back</span>
+<h2 class="font-headline-xl-mobile text-headline-xl-mobile text-palette-navy font-bold tracking-tight truncate">Hello, Rajesh</h2>
+<div class="flex items-center gap-1.5 mt-1 text-palette-navy-text/75 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-palette-cobalt" style="font-variation-settings: 'FILL' 1;">home_pin</span>
+<span class="truncate font-medium">Bishnupur Village</span>
+</div>
+</div>
+<div class="bg-palette-ice border border-palette-slate/50 px-3.5 py-1.5 rounded-xl flex-shrink-0 text-right">
+<span class="font-label-sm text-label-sm text-palette-navy-text/70 block text-right font-medium">ABHA ID</span>
+<span class="font-label-sm text-label-sm text-palette-navy font-bold tracking-wide">91-4820-1928</span>
+</div>
+</div>
+</div>
+<!-- Daily Health Status Card (Simple Traffic Light Reassurance) -->
+<section aria-labelledby="status-heading" class="bg-white border border-palette-slate-border rounded-2xl p-5 mb-5 shadow-xs">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded-full bg-error animate-pulse"></span>
+<h3 class="font-headline-md text-headline-md text-palette-navy font-bold" id="status-heading">Attention Needed</h3>
+</div>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-2.5 py-1 rounded-full font-bold">Action Advised</span>
+</div>
+<!-- Health Vitals Grid -->
+<div class="grid grid-cols-1 gap-3 mb-4">
+<!-- Blood Sugar Metric -->
+<div class="bg-palette-ice border border-palette-slate/50 rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-palette-navy font-bold block">Blood Sugar (Post-Meal)</span>
+<span class="font-body-sm text-body-sm text-palette-navy-text/70">Checked 2 hours ago</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-error font-bold block leading-none">245</span>
+<span class="font-label-sm text-label-sm text-on-error-container font-semibold">mg/dL • High</span>
+</div>
+</div>
+<!-- Eye Health Indicator -->
+<div class="bg-palette-ice border border-palette-slate/50 rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-white border border-palette-slate/60 text-palette-cobalt flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">visibility</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-palette-navy font-bold block">Retinopathy Risk</span>
+<span class="font-body-sm text-body-sm text-palette-navy-text/70">Urgent Eye Check</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-palette-cobalt font-bold block leading-none">78%</span>
+<span class="font-label-sm text-label-sm text-palette-navy-text/75 font-semibold">Elevated</span>
+</div>
+</div>
+</div>
+<!-- Plain English Doctor Explanation Note -->
+<div class="bg-palette-ice-container/40 border border-palette-slate/60 rounded-xl p-4 flex items-start gap-3">
+<span class="material-symbols-outlined text-palette-cobalt text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
+<p class="font-body-md text-body-md text-palette-navy-text leading-relaxed">
+        High blood sugar can harm small blood vessels in your eyes. An eye photo scan is recommended this week.
+      </p>
+</div>
+</section>
+<!-- Big 2-Column Action Buttons (Ultra Large Touch Targets) -->
+<section aria-label="Quick Actions" class="mb-5">
+<div class="grid grid-cols-2 gap-3">
+<!-- Action 1: Log Sugar -->
+<button class="bg-white border border-palette-slate-border active:bg-palette-ice rounded-2xl p-4 flex flex-col justify-between min-h-[140px] text-left shadow-xs transition-colors" onclick="alert('Opening Sugar Reading Pad')">
+<div class="w-12 h-12 rounded-xl bg-palette-ice border border-palette-slate/50 text-palette-cobalt flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">bloodtype</span>
+</div>
+<div>
+<span class="font-headline-sm text-headline-sm text-palette-navy font-bold block leading-snug">Log Today's Sugar</span>
+<span class="font-body-sm text-body-sm text-palette-navy-text/70 block mt-1">Enter glucometer reading</span>
+</div>
+</button>
+<!-- Action 2: Eye Risk Check -->
+<button class="bg-white border border-palette-slate-border active:bg-palette-ice rounded-2xl p-4 flex flex-col justify-between min-h-[140px] text-left shadow-xs transition-colors" onclick="alert('Opening Eye Assessment Guide')">
+<div class="w-12 h-12 rounded-xl bg-palette-ice border border-palette-slate/50 text-palette-cobalt flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">eye_tracking</span>
+</div>
+<div>
+<span class="font-headline-sm text-headline-sm text-palette-navy font-bold block leading-snug">Check Eye Risk</span>
+<span class="font-body-sm text-body-sm text-palette-navy-text/70 block mt-1">Learn about your eyes</span>
+</div>
+</button></div>
+</section></div>
+<!-- ASHA Worker Care Connection Card -->
+<section aria-labelledby="asha-worker-heading" class="bg-white border border-palette-slate-border rounded-2xl p-5 mb-5 shadow-xs">
+<div class="flex items-center justify-between mb-4">
+<div>
+<span class="font-label-sm text-label-sm text-palette-navy-text/70 uppercase tracking-wider block font-bold">Local Health Support</span>
+<h3 class="font-headline-md text-headline-md text-palette-navy font-bold" id="asha-worker-heading">Your Assigned Health Worker</h3>
+</div>
+<div class="w-3 h-3 rounded-full bg-palette-cobalt"></div>
+</div>
+<!-- Health Worker Profile Block -->
+<div class="flex items-center gap-3.5 mb-5 bg-palette-ice border border-palette-slate/50 rounded-xl p-3.5">
+<img class="w-14 h-14 rounded-full object-cover flex-shrink-0 ring-2 ring-white" data-alt="Close-up warm photographic portrait of Sandhya, a confident Indian female community healthcare ASHA worker in a gentle blue-bordered uniform saree, smiling kindly outdoors in a sunny rural clinic courtyard, natural midday daylight, authentic and reassuring." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1xiTVrUtXEFym6kHYmKcut3GOB4Kn2KmLJh3R-Bburyr9oVltfaLdaKU8R1odhOPHQOJL2AJrawUInnUQrReDToeE0_c3Kphc-NXLLPEIB_OWxfkjUIZGSOC-VOiqqR3C1wuLQNRVkdO28rqF1otIbwg28H-QjXaUhI5aZvQdXX72vCZCX2fC9GGzxP_vcwokC6ZFLmNlZRmSKjBNTP78lbCaxD4nepSGHV-tU8aISwaMcZB4k3-iGg"/>
+<div class="min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-palette-navy font-bold truncate">Sandhya Didi</h4>
+<p class="font-body-sm text-body-sm text-palette-navy-text/75 truncate">ASHA Worker • Bishnupur</p>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-palette-cobalt font-semibold mt-0.5">
+<span class="w-2 h-2 rounded-full bg-palette-cobalt"></span>
+          Available in Bishnupur Sub-Center
+        </span>
+</div>
+</div>
+<!-- Primary & Secondary Contact Actions -->
+<div class="flex flex-col gap-2.5">
+<a class="w-full bg-palette-cobalt hover:bg-palette-cobalt-hover text-white font-headline-sm text-headline-sm h-14 rounded-xl flex items-center justify-center gap-2 active:opacity-95 shadow-md shadow-palette-cobalt/25 transition-all" href="tel:+919876543210">
+<span class="material-symbols-outlined text-[24px]">call</span>
+<span>Call Sandhya Didi</span>
+</a>
+<button class="w-full bg-palette-ice hover:bg-palette-ice-container/50 border border-palette-slate text-palette-cobalt font-label-lg text-label-lg h-12 rounded-xl flex items-center justify-center gap-2 active:bg-palette-ice-container transition-colors font-bold" onclick="this.innerText = 'Visit Request Sent ✓'; this.disabled = true;">
+<span class="material-symbols-outlined text-[20px]">person_pin_circle</span>
+<span>Request Home Visit</span>
+</button>
+</div>
+</section>
+<!-- Upcoming PHC Camp & Clinic Reminder -->
+<section aria-labelledby="camp-heading" class="bg-white border border-palette-slate-border rounded-2xl p-5 shadow-xs">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-palette-ice border border-palette-slate/60 text-palette-cobalt flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<div class="flex-1 min-w-0">
+<span class="font-label-sm text-label-sm text-palette-navy-text/70 uppercase tracking-wider block font-bold">Village Clinic Update</span>
+<h3 class="font-headline-sm text-headline-sm text-palette-navy font-bold mt-0.5" id="camp-heading">Next Free Eye Camp</h3>
+<p class="font-body-md text-body-md text-palette-navy-text mt-1 leading-snug font-medium">
+          Thursday, 10 AM at Sub-Center 4
+        </p>
+<p class="font-body-sm text-body-sm text-palette-navy-text/70 mt-0.5">
+          Includes free digital retinal screening and doctor consultation
+        </p>
+<div class="mt-4">
+<button class="w-full bg-palette-cobalt hover:bg-palette-cobalt-hover text-white font-label-lg text-label-lg h-12 rounded-xl flex items-center justify-center gap-2 active:opacity-95 shadow-md shadow-palette-cobalt/25 transition-all font-bold" id="bookSlotBtn" onclick="this.innerHTML = '&lt;span class=\'material-symbols-outlined\'&gt;check_circle&lt;/span&gt; Slot Confirmed for Thursday'; this.classList.replace('bg-palette-cobalt','bg-palette-ice'); this.classList.replace('text-white','text-palette-navy'); this.classList.add('border','border-palette-slate');">
+<span class="material-symbols-outlined text-[20px]">calendar_add_on</span>
+<span>Book Free Slot</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Simple Audio Player Toast Notification Simulation -->
+<div class="fixed bottom-20 left-4 right-4 bg-palette-navy text-palette-ice rounded-xl p-4 flex items-center justify-between shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-40 border border-palette-slate/40" id="audioToast">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-palette-slate animate-pulse">volume_up</span>
+<span class="font-body-sm text-body-sm text-white">Playing audio guidance in Bengali...</span>
+</div>
+<button class="text-palette-slate hover:text-white font-label-sm text-label-sm px-2 py-1 font-bold" id="closeAudioBtn">Stop</button>
+</div>
+<script>
+  // Simple Audio Guidance Micro-interaction
+  const audioBtn = document.getElementById('audioGuidanceBtn');
+  const audioToast = document.getElementById('audioToast');
+  const closeAudioBtn = document.getElementById('closeAudioBtn');
+
+  if (audioBtn && audioToast && closeAudioBtn) {
+    audioBtn.addEventListener('click', () => {
+      audioToast.classList.remove('opacity-0', 'pointer-events-none');
+      audioToast.classList.add('opacity-100');
+    });
+
+    closeAudioBtn.addEventListener('click', () => {
+      audioToast.classList.add('opacity-0', 'pointer-events-none');
+      audioToast.classList.remove('opacity-100');
+    });
+  }
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-white border-t border-palette-slate-border shadow-[0_-2px_12px_rgba(6,16,38,0.06)]" data-active-classes="text-palette-cobalt font-semibold"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-palette-cobalt transition-colors" data-path="asha-home" href="#"><span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span><span class="font-label-sm text-label-sm mt-0.5 font-bold">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-palette-navy-text/60 hover:text-palette-navy transition-colors" data-path="screening-queue" href="#"><span class="material-symbols-outlined text-[24px]">view_list</span><span class="font-label-sm text-label-sm mt-0.5 font-medium">Queue</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-palette-navy-text/60 hover:text-palette-navy transition-colors" data-path="scan-assessment" href="#"><span class="material-symbols-outlined text-[24px]">qr_code_scanner</span><span class="font-label-sm text-label-sm mt-0.5 font-medium">Scan</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-palette-navy-text/60 hover:text-palette-navy transition-colors" data-path="asha-profile" href="#"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-sm text-label-sm mt-0.5 font-medium">Profile</span></a></div></nav></body></html>

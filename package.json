@@ -1,0 +1,18 @@
+{
+  "name": "retisync",
+  "version": "1.0.0",
+  "description": "Retisync - Connected Stitch Project for Diabetic Retinopathy & Glycemic Triage",
+  "scripts": {
+    "start": "serve . -l 3000",
+    "dev": "serve . -l 3000",
+    "sync": "node sync.js"
+  },
+  "stitch": {
+    "projectId": "18191915217520479162",
+    "projectUrl": "https://stitch.withgoogle.com/projects/18191915217520479162"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
